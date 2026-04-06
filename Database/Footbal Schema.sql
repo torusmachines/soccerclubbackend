@@ -1188,7 +1188,7 @@ ALTER FUNCTION stf.fn_notes_exists(p_id character varying) OWNER TO postgres;
 -- Name: fn_notes_get_all(); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.fn_notes_get_all() RETURNS TABLE(note_id character varying, player_id character varying, club_id character varying, topic character varying, description text, category character varying, follow_up_date date, created_by_scout_id character varying, created_at timestamp without time zone)
+CREATE FUNCTION stf.fn_notes_get_all() RETURNS TABLE(note_id character varying, player_id character varying, club_id character varying, topic character varying, description text, category character varying, follow_up_date date, is_visible_to_player boolean, created_by_scout_id character varying, created_at timestamp without time zone)
     LANGUAGE sql STABLE
     AS $$
     SELECT
@@ -1199,6 +1199,7 @@ CREATE FUNCTION stf.fn_notes_get_all() RETURNS TABLE(note_id character varying, 
         description,
         category,
         follow_up_date,
+        is_visible_to_player,
         created_by_scout_id,
         created_at
     FROM stf.notes
@@ -1213,7 +1214,7 @@ ALTER FUNCTION stf.fn_notes_get_all() OWNER TO postgres;
 -- Name: fn_notes_get_by_club_id(character varying); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.fn_notes_get_by_club_id(p_club_id character varying) RETURNS TABLE(note_id character varying, player_id character varying, club_id character varying, topic character varying, description text, category character varying, follow_up_date date, created_by_scout_id character varying, created_at timestamp without time zone)
+CREATE FUNCTION stf.fn_notes_get_by_club_id(p_club_id character varying) RETURNS TABLE(note_id character varying, player_id character varying, club_id character varying, topic character varying, description text, category character varying, follow_up_date date, is_visible_to_player boolean, created_by_scout_id character varying, created_at timestamp without time zone)
     LANGUAGE sql STABLE
     AS $$
     SELECT
@@ -1224,6 +1225,7 @@ CREATE FUNCTION stf.fn_notes_get_by_club_id(p_club_id character varying) RETURNS
         description,
         category,
         follow_up_date,
+        is_visible_to_player,
         created_by_scout_id,
         created_at
     FROM stf.notes
@@ -1239,7 +1241,7 @@ ALTER FUNCTION stf.fn_notes_get_by_club_id(p_club_id character varying) OWNER TO
 -- Name: fn_notes_get_by_id(character varying); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.fn_notes_get_by_id(p_id character varying) RETURNS TABLE(note_id character varying, player_id character varying, club_id character varying, topic character varying, description text, category character varying, follow_up_date date, created_by_scout_id character varying, created_at timestamp without time zone)
+CREATE FUNCTION stf.fn_notes_get_by_id(p_id character varying) RETURNS TABLE(note_id character varying, player_id character varying, club_id character varying, topic character varying, description text, category character varying, follow_up_date date, is_visible_to_player boolean, created_by_scout_id character varying, created_at timestamp without time zone)
     LANGUAGE sql STABLE
     AS $$
     SELECT
@@ -1250,6 +1252,7 @@ CREATE FUNCTION stf.fn_notes_get_by_id(p_id character varying) RETURNS TABLE(not
         description,
         category,
         follow_up_date,
+        is_visible_to_player,
         created_by_scout_id,
         created_at
     FROM stf.notes
@@ -1264,7 +1267,7 @@ ALTER FUNCTION stf.fn_notes_get_by_id(p_id character varying) OWNER TO postgres;
 -- Name: fn_notes_get_by_player_id(character varying); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.fn_notes_get_by_player_id(p_player_id character varying) RETURNS TABLE(note_id character varying, player_id character varying, club_id character varying, topic character varying, description text, category character varying, follow_up_date date, created_by_scout_id character varying, created_at timestamp without time zone)
+CREATE FUNCTION stf.fn_notes_get_by_player_id(p_player_id character varying) RETURNS TABLE(note_id character varying, player_id character varying, club_id character varying, topic character varying, description text, category character varying, follow_up_date date, is_visible_to_player boolean, created_by_scout_id character varying, created_at timestamp without time zone)
     LANGUAGE sql STABLE
     AS $$
     SELECT
@@ -1275,6 +1278,7 @@ CREATE FUNCTION stf.fn_notes_get_by_player_id(p_player_id character varying) RET
         description,
         category,
         follow_up_date,
+        is_visible_to_player,
         created_by_scout_id,
         created_at
     FROM stf.notes
@@ -1308,7 +1312,7 @@ ALTER FUNCTION stf.fn_notes_get_max_id() OWNER TO postgres;
 -- Name: fn_notes_insert(character varying, character varying, text, character varying, character varying, timestamp without time zone, character varying, character varying, date); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.fn_notes_insert(p_note_id character varying, p_topic character varying, p_description text, p_category character varying, p_created_by_scout_id character varying, p_created_at timestamp without time zone, p_player_id character varying DEFAULT NULL::character varying, p_club_id character varying DEFAULT NULL::character varying, p_follow_up_date date DEFAULT NULL::date) RETURNS void
+CREATE FUNCTION stf.fn_notes_insert(p_note_id character varying, p_topic character varying, p_description text, p_category character varying, p_created_by_scout_id character varying, p_created_at timestamp without time zone, p_player_id character varying DEFAULT NULL::character varying, p_club_id character varying DEFAULT NULL::character varying, p_follow_up_date date DEFAULT NULL::date, p_is_visible_to_player boolean DEFAULT false) RETURNS void
     LANGUAGE sql
     AS $$
     INSERT INTO stf.notes (
@@ -1319,6 +1323,7 @@ CREATE FUNCTION stf.fn_notes_insert(p_note_id character varying, p_topic charact
         description,
         category,
         follow_up_date,
+        is_visible_to_player,
         created_by_scout_id,
         created_at
     )
@@ -1330,6 +1335,7 @@ CREATE FUNCTION stf.fn_notes_insert(p_note_id character varying, p_topic charact
         p_description,
         p_category,
         p_follow_up_date,
+        p_is_visible_to_player,
         p_created_by_scout_id,
         p_created_at
     );
@@ -1343,7 +1349,7 @@ ALTER FUNCTION stf.fn_notes_insert(p_note_id character varying, p_topic characte
 -- Name: fn_notes_update(character varying, character varying, text, character varying, date); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.fn_notes_update(p_note_id character varying, p_topic character varying, p_description text, p_category character varying, p_follow_up_date date DEFAULT NULL::date) RETURNS integer
+CREATE FUNCTION stf.fn_notes_update(p_note_id character varying, p_topic character varying, p_description text, p_category character varying, p_follow_up_date date DEFAULT NULL::date, p_is_visible_to_player boolean DEFAULT false) RETURNS integer
     LANGUAGE plpgsql
     AS $$
 DECLARE
@@ -1351,10 +1357,11 @@ DECLARE
 BEGIN
     UPDATE stf.notes
     SET
-        topic          = p_topic,
-        description    = p_description,
-        category       = p_category,
-        follow_up_date = p_follow_up_date
+        topic              = p_topic,
+        description        = p_description,
+        category           = p_category,
+        follow_up_date     = p_follow_up_date,
+        is_visible_to_player = p_is_visible_to_player
     WHERE note_id = p_note_id;
 
     GET DIAGNOSTICS v_affected = ROW_COUNT;
@@ -3285,6 +3292,7 @@ CREATE TABLE stf.notes (
     description text NOT NULL,
     category character varying(30) NOT NULL,
     follow_up_date date,
+    is_visible_to_player boolean NOT NULL DEFAULT false,
     created_by_scout_id character varying(50) NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
 );

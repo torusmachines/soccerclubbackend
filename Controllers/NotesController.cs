@@ -41,6 +41,12 @@ public class NotesController : ControllerBase
     public async Task<ActionResult<IEnumerable<Note>>> GetNotesByClub(string clubId)
     {
         var notes = await _noteService.GetNotesByClubIdAsync(clubId);
+
+        if (User.IsInRole("Player"))
+        {
+            notes = notes.Where(note => note.IsVisibleToPlayer).ToList();
+        }
+
         return Ok(notes);
     }
 
@@ -48,6 +54,12 @@ public class NotesController : ControllerBase
     public async Task<ActionResult<IEnumerable<Note>>> GetNotesByPlayer(string playerId)
     {
         var notes = await _noteService.GetNotesByPlayerIdAsync(playerId);
+
+        if (User.IsInRole("Player"))
+        {
+            notes = notes.Where(note => note.IsVisibleToPlayer).ToList();
+        }
+
         return Ok(notes);
     }
 

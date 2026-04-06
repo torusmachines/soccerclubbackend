@@ -1,63 +1,5 @@
 [
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.AuthController",
-    "Method": "AcceptInvite",
-    "RelativePath": "api/auth/accept-invite",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "request",
-        "Type": "FootballDashboardAPI.Models.AcceptInviteRequest",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "FootballDashboardAPI.Controllers.AuthController",
-    "Method": "InviteUser",
-    "RelativePath": "api/auth/invite-user",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "request",
-        "Type": "FootballDashboardAPI.Models.InviteUserRequest",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "FootballDashboardAPI.Controllers.AuthController",
-    "Method": "Login",
-    "RelativePath": "api/auth/login",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "request",
-        "Type": "FootballDashboardAPI.Models.LoginRequest",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "FootballDashboardAPI.Controllers.AuthController",
-    "Method": "Me",
-    "RelativePath": "api/auth/me",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
     "ContainingType": "FootballDashboardAPI.Controllers.ClubContactsController",
     "Method": "GetAll",
     "RelativePath": "api/ClubContacts",
@@ -306,69 +248,6 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.ClubsController",
-    "Method": "UploadClubLogo",
-    "RelativePath": "api/Clubs/upload-logo/{clubId}",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "clubId",
-        "Type": "System.String",
-        "IsRequired": true
-      },
-      {
-        "Name": "file",
-        "Type": "Microsoft.AspNetCore.Http.IFormFile",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "FootballDashboardAPI.Controllers.CompanyProfileController",
-    "Method": "Get",
-    "RelativePath": "api/CompanyProfile",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "FootballDashboardAPI.Controllers.CompanyProfileController",
-    "Method": "Upsert",
-    "RelativePath": "api/CompanyProfile",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "FootballDashboardAPI.Models.CompanyProfileDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "FootballDashboardAPI.Controllers.CompanyProfileController",
-    "Method": "UploadLogo",
-    "RelativePath": "api/CompanyProfile/upload-logo",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "file",
-        "Type": "Microsoft.AspNetCore.Http.IFormFile",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
     "ContainingType": "FootballDashboardAPI.Controllers.DocumentsController",
     "Method": "GetAll",
     "RelativePath": "api/Documents",
@@ -432,7 +311,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.EmailsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.Email, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "GetAll",
     "RelativePath": "api/Emails",
     "HttpMethod": "GET",
@@ -452,7 +331,7 @@
     ]
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.EmailsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.Email, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "Create",
     "RelativePath": "api/Emails",
     "HttpMethod": "POST",
@@ -460,7 +339,7 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "dto",
+        "Name": "entity",
         "Type": "FootballDashboardAPI.Models.Email",
         "IsRequired": true
       }
@@ -478,7 +357,7 @@
     ]
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.EmailsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.Email, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "GetById",
     "RelativePath": "api/Emails/{id}",
     "HttpMethod": "GET",
@@ -504,7 +383,7 @@
     ]
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.EmailsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.Email, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "Update",
     "RelativePath": "api/Emails/{id}",
     "HttpMethod": "PUT",
@@ -517,25 +396,15 @@
         "IsRequired": true
       },
       {
-        "Name": "dto",
+        "Name": "entity",
         "Type": "FootballDashboardAPI.Models.Email",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": [
-      {
-        "Type": "FootballDashboardAPI.Models.Email",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
+    "ReturnTypes": []
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.EmailsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.Email, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "Delete",
     "RelativePath": "api/Emails/{id}",
     "HttpMethod": "DELETE",
@@ -841,28 +710,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.PlayersController",
-    "Method": "UploadPlayerImage",
-    "RelativePath": "api/Players/upload-image/{playerId}",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "playerId",
-        "Type": "System.Int64",
-        "IsRequired": true
-      },
-      {
-        "Name": "file",
-        "Type": "Microsoft.AspNetCore.Http.IFormFile",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "FootballDashboardAPI.Controllers.ReviewRatingsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.ReviewRating, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "GetAll",
     "RelativePath": "api/ReviewRatings",
     "HttpMethod": "GET",
@@ -882,7 +730,7 @@
     ]
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.ReviewRatingsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.ReviewRating, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "Create",
     "RelativePath": "api/ReviewRatings",
     "HttpMethod": "POST",
@@ -890,7 +738,7 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "rating",
+        "Name": "entity",
         "Type": "FootballDashboardAPI.Models.ReviewRating",
         "IsRequired": true
       }
@@ -908,7 +756,7 @@
     ]
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.ReviewRatingsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.ReviewRating, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "GetById",
     "RelativePath": "api/ReviewRatings/{id}",
     "HttpMethod": "GET",
@@ -934,7 +782,7 @@
     ]
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.ReviewRatingsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.ReviewRating, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "Update",
     "RelativePath": "api/ReviewRatings/{id}",
     "HttpMethod": "PUT",
@@ -947,25 +795,15 @@
         "IsRequired": true
       },
       {
-        "Name": "rating",
+        "Name": "entity",
         "Type": "FootballDashboardAPI.Models.ReviewRating",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": [
-      {
-        "Type": "FootballDashboardAPI.Models.ReviewRating",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
+    "ReturnTypes": []
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.ReviewRatingsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.ReviewRating, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "Delete",
     "RelativePath": "api/ReviewRatings/{id}",
     "HttpMethod": "DELETE",
@@ -1152,7 +990,7 @@
     ]
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.ReviewSkillDetailsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.ReviewSkillDetail, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "GetAll",
     "RelativePath": "api/ReviewSkillDetails",
     "HttpMethod": "GET",
@@ -1172,7 +1010,7 @@
     ]
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.ReviewSkillDetailsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.ReviewSkillDetail, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "Create",
     "RelativePath": "api/ReviewSkillDetails",
     "HttpMethod": "POST",
@@ -1180,7 +1018,7 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "detail",
+        "Name": "entity",
         "Type": "FootballDashboardAPI.Models.ReviewSkillDetail",
         "IsRequired": true
       }
@@ -1198,20 +1036,15 @@
     ]
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.ReviewSkillDetailsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.ReviewSkillDetail, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "GetById",
-    "RelativePath": "api/ReviewSkillDetails/{reviewId}/{skillKey}",
+    "RelativePath": "api/ReviewSkillDetails/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "reviewId",
-        "Type": "System.String",
-        "IsRequired": true
-      },
-      {
-        "Name": "skillKey",
+        "Name": "id",
         "Type": "System.String",
         "IsRequired": true
       }
@@ -1229,87 +1062,41 @@
     ]
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.ReviewSkillDetailsController",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.ReviewSkillDetail, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
     "Method": "Update",
-    "RelativePath": "api/ReviewSkillDetails/{reviewId}/{skillKey}",
+    "RelativePath": "api/ReviewSkillDetails/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "reviewId",
+        "Name": "id",
         "Type": "System.String",
         "IsRequired": true
       },
       {
-        "Name": "skillKey",
-        "Type": "System.String",
-        "IsRequired": true
-      },
-      {
-        "Name": "detail",
+        "Name": "entity",
         "Type": "FootballDashboardAPI.Models.ReviewSkillDetail",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "FootballDashboardAPI.Models.ReviewSkillDetail",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "FootballDashboardAPI.Controllers.ReviewSkillDetailsController",
-    "Method": "Delete",
-    "RelativePath": "api/ReviewSkillDetails/{reviewId}/{skillKey}",
-    "HttpMethod": "DELETE",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "reviewId",
-        "Type": "System.String",
-        "IsRequired": true
-      },
-      {
-        "Name": "skillKey",
-        "Type": "System.String",
         "IsRequired": true
       }
     ],
     "ReturnTypes": []
   },
   {
-    "ContainingType": "FootballDashboardAPI.Controllers.ReviewSkillDetailsController",
-    "Method": "GetByReviewId",
-    "RelativePath": "api/ReviewSkillDetails/review/{reviewId}",
-    "HttpMethod": "GET",
+    "ContainingType": "FootballDashboardAPI.Controllers.EntityCrudController\u00601[[FootballDashboardAPI.Models.ReviewSkillDetail, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+    "Method": "Delete",
+    "RelativePath": "api/ReviewSkillDetails/{id}",
+    "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "reviewId",
+        "Name": "id",
         "Type": "System.String",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": [
-      {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[FootballDashboardAPI.Models.ReviewSkillDetail, FootballDashboardAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
+    "ReturnTypes": []
   },
   {
     "ContainingType": "FootballDashboardAPI.Controllers.ScoutsController",

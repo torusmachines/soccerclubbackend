@@ -46,6 +46,9 @@ public partial class Note
     [Precision(0)]
     public DateTime CreatedAt { get; set; }
 
+    [Column("is_visible_to_player")]
+    public bool IsVisibleToPlayer { get; set; }
+
     [ForeignKey("ClubId")]
     [InverseProperty("Notes")]
     public virtual Club? Club { get; set; }
@@ -66,6 +69,7 @@ public class CreateNote
     public string Description { get; set; } = null!;
     public string Category { get; set; } = null!;
     public DateOnly? FollowUpDate { get; set; }
+    public bool IsVisibleToPlayer { get; set; } = false;
     public string CreatedByScoutId { get; set; } = null!;
 }
 
@@ -75,4 +79,5 @@ public class UpdateNote
     public string Description { get; set; } = null!;
     public string Category { get; set; } = null!;
     public DateOnly? FollowUpDate { get; set; }
+    public bool IsVisibleToPlayer { get; set; } = false;
 }

@@ -37,5 +37,8 @@ namespace FootballDashboardAPI.Models
         public string TwitterUrl { get; set; } = string.Empty;
         public string LinkedinUrl { get; set; } = string.Empty;
         public string YoutubeUrl { get; set; } = string.Empty;
+
+        // Contract settings
+        public int ContractExpiringMonths { get; set; } = 6;
     }
 }

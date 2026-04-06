@@ -5,111 +5,6 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/auth/invite-user": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InviteUserRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InviteUserRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/InviteUserRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/auth/accept-invite": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AcceptInviteRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AcceptInviteRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/AcceptInviteRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/auth/login": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/auth/me": {
-      "get": {
-        "tags": [
-          "Auth"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/ClubContacts": {
       "get": {
         "tags": [
@@ -508,126 +403,11 @@
         }
       }
     },
-    "/api/Clubs/upload-logo/{clubId}": {
-      "post": {
-        "tags": [
-          "Clubs"
-        ],
-        "parameters": [
-          {
-            "name": "clubId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              },
-              "encoding": {
-                "file": {
-                  "style": "form"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Clubs/test-email": {
       "get": {
         "tags": [
           "Clubs"
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/CompanyProfile": {
-      "get": {
-        "tags": [
-          "CompanyProfile"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "CompanyProfile"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CompanyProfileDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CompanyProfileDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CompanyProfileDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/CompanyProfile/upload-logo": {
-      "post": {
-        "tags": [
-          "CompanyProfile"
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              },
-              "encoding": {
-                "file": {
-                  "style": "form"
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK"
@@ -894,24 +674,7 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Email"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Email"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Email"
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       },
@@ -1433,49 +1196,6 @@
         }
       }
     },
-    "/api/Players/upload-image/{playerId}": {
-      "post": {
-        "tags": [
-          "Players"
-        ],
-        "parameters": [
-          {
-            "name": "playerId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              },
-              "encoding": {
-                "file": {
-                  "style": "form"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/ReviewRatings": {
       "get": {
         "tags": [
@@ -1633,24 +1353,7 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReviewRating"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReviewRating"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReviewRating"
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       },
@@ -2054,22 +1757,14 @@
         }
       }
     },
-    "/api/ReviewSkillDetails/{reviewId}/{skillKey}": {
+    "/api/ReviewSkillDetails/{id}": {
       "get": {
         "tags": [
           "ReviewSkillDetails"
         ],
         "parameters": [
           {
-            "name": "reviewId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "skillKey",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -2106,15 +1801,7 @@
         ],
         "parameters": [
           {
-            "name": "reviewId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "skillKey",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -2143,24 +1830,7 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReviewSkillDetail"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReviewSkillDetail"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReviewSkillDetail"
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       },
@@ -2170,15 +1840,7 @@
         ],
         "parameters": [
           {
-            "name": "reviewId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "skillKey",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -2189,54 +1851,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/ReviewSkillDetails/review/{reviewId}": {
-      "get": {
-        "tags": [
-          "ReviewSkillDetails"
-        ],
-        "parameters": [
-          {
-            "name": "reviewId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ReviewSkillDetail"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ReviewSkillDetail"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ReviewSkillDetail"
-                  }
-                }
-              }
-            }
           }
         }
       }
@@ -3043,29 +2657,6 @@
   },
   "components": {
     "schemas": {
-      "AcceptInviteRequest": {
-        "required": [
-          "confirmPassword",
-          "inviteToken",
-          "password"
-        ],
-        "type": "object",
-        "properties": {
-          "inviteToken": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "password": {
-            "minLength": 8,
-            "type": "string"
-          },
-          "confirmPassword": {
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "Club": {
         "type": "object",
         "properties": {
@@ -3207,113 +2798,6 @@
           },
           "club": {
             "$ref": "#/components/schemas/Club"
-          }
-        },
-        "additionalProperties": false
-      },
-      "CompanyProfileDto": {
-        "type": "object",
-        "properties": {
-          "companyName": {
-            "type": "string",
-            "nullable": true
-          },
-          "shortName": {
-            "type": "string",
-            "nullable": true
-          },
-          "tagline": {
-            "type": "string",
-            "nullable": true
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "foundedYear": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "logoUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "primaryColor": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "phoneNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "alternatePhone": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressLine1": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressLine2": {
-            "type": "string",
-            "nullable": true
-          },
-          "areaLocality": {
-            "type": "string",
-            "nullable": true
-          },
-          "city": {
-            "type": "string",
-            "nullable": true
-          },
-          "district": {
-            "type": "string",
-            "nullable": true
-          },
-          "state": {
-            "type": "string",
-            "nullable": true
-          },
-          "country": {
-            "type": "string",
-            "nullable": true
-          },
-          "postalCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "organizationType": {
-            "type": "string",
-            "nullable": true
-          },
-          "sportType": {
-            "type": "string",
-            "nullable": true
-          },
-          "facebookUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "instagramUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "twitterUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "linkedinUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "youtubeUrl": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3508,14 +2992,6 @@
           "contact_info": {
             "type": "string",
             "nullable": true
-          },
-          "profileImage": {
-            "type": "string",
-            "nullable": true
-          },
-          "player_email": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3533,8 +3009,7 @@
           },
           "matchDate": {
             "type": "string",
-            "format": "date",
-            "nullable": true
+            "format": "date"
           },
           "club1Id": {
             "type": "string",
@@ -3559,46 +3034,6 @@
             "nullable": true
           },
           "roleName": {
-            "type": "string",
-            "nullable": true
-          },
-          "firstName": {
-            "type": "string",
-            "nullable": true
-          },
-          "lastName": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "phoneNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressLine1": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressLine2": {
-            "type": "string",
-            "nullable": true
-          },
-          "city": {
-            "type": "string",
-            "nullable": true
-          },
-          "state": {
-            "type": "string",
-            "nullable": true
-          },
-          "postalCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "country": {
             "type": "string",
             "nullable": true
           }
@@ -3812,51 +3247,6 @@
         },
         "additionalProperties": false
       },
-      "InviteUserRequest": {
-        "required": [
-          "email",
-          "fullName",
-          "role"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "minLength": 1,
-            "type": "string",
-            "format": "email"
-          },
-          "fullName": {
-            "maxLength": 150,
-            "minLength": 2,
-            "type": "string"
-          },
-          "role": {
-            "minLength": 1,
-            "pattern": "^(Admin|Player|Scout)$",
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LoginRequest": {
-        "required": [
-          "email",
-          "password"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "minLength": 1,
-            "type": "string",
-            "format": "email"
-          },
-          "password": {
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "Note": {
         "type": "object",
         "properties": {
@@ -3998,14 +3388,6 @@
           "agent_scout_id": {
             "type": "string",
             "nullable": true
-          },
-          "profileImage": {
-            "type": "string",
-            "nullable": true
-          },
-          "player_email": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -4071,12 +3453,6 @@
           },
           "agentName": {
             "maxLength": 150,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "playerEmail": {
-            "maxLength": 255,
             "minLength": 0,
             "type": "string",
             "nullable": true
@@ -4174,8 +3550,7 @@
           },
           "matchDate": {
             "type": "string",
-            "format": "date",
-            "nullable": true
+            "format": "date"
           },
           "club1Id": {
             "maxLength": 50,
@@ -4316,68 +3691,6 @@
             "nullable": true
           },
           "roleName": {
-            "maxLength": 100,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "firstName": {
-            "maxLength": 100,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "lastName": {
-            "maxLength": 100,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "maxLength": 255,
-            "minLength": 0,
-            "type": "string",
-            "format": "email",
-            "nullable": true
-          },
-          "phoneNumber": {
-            "maxLength": 20,
-            "minLength": 0,
-            "type": "string",
-            "format": "tel",
-            "nullable": true
-          },
-          "addressLine1": {
-            "maxLength": 255,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "addressLine2": {
-            "maxLength": 255,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "city": {
-            "maxLength": 100,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "state": {
-            "maxLength": 100,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "postalCode": {
-            "maxLength": 20,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "country": {
             "maxLength": 100,
             "minLength": 0,
             "type": "string",
@@ -4706,10 +4019,6 @@
           "contact_info": {
             "type": "string",
             "nullable": true
-          },
-          "profileImage": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -4719,8 +4028,7 @@
         "properties": {
           "matchDate": {
             "type": "string",
-            "format": "date",
-            "nullable": true
+            "format": "date"
           },
           "club1Id": {
             "type": "string",
@@ -4745,46 +4053,6 @@
             "nullable": true
           },
           "roleName": {
-            "type": "string",
-            "nullable": true
-          },
-          "firstName": {
-            "type": "string",
-            "nullable": true
-          },
-          "lastName": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "phoneNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressLine1": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressLine2": {
-            "type": "string",
-            "nullable": true
-          },
-          "city": {
-            "type": "string",
-            "nullable": true
-          },
-          "state": {
-            "type": "string",
-            "nullable": true
-          },
-          "postalCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "country": {
             "type": "string",
             "nullable": true
           }

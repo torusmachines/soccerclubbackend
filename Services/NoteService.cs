@@ -68,6 +68,7 @@ public class NoteService : INoteService
             Description = createNoteDto.Description,
             Category = createNoteDto.Category,
             FollowUpDate = createNoteDto.FollowUpDate,
+            IsVisibleToPlayer = createNoteDto.IsVisibleToPlayer,
             CreatedByScoutId = createNoteDto.CreatedByScoutId,
             CreatedAt = DateTime.UtcNow
         };
@@ -91,6 +92,7 @@ public class NoteService : INoteService
             Description = updateNoteDto.Description,
             Category = updateNoteDto.Category,
             FollowUpDate = updateNoteDto.FollowUpDate,
+            IsVisibleToPlayer = updateNoteDto.IsVisibleToPlayer,
             CreatedByScoutId = existingNote.CreatedByScoutId,
             CreatedAt = existingNote.CreatedAt
         };
@@ -115,6 +117,7 @@ public class NoteService : INoteService
             Description = note.Description,
             Category = note.Category,
             FollowUpDate = note.FollowUpDate,
+            IsVisibleToPlayer = note.IsVisibleToPlayer,
             CreatedByScoutId = note.CreatedByScoutId,
             CreatedAt = note.CreatedAt
         };

@@ -54,7 +54,8 @@ namespace FootballDashboardAPI.Controllers
                 InstagramUrl = profile.InstagramUrl,
                 TwitterUrl = profile.TwitterUrl,
                 LinkedinUrl = profile.LinkedinUrl,
-                YoutubeUrl = profile.YoutubeUrl
+                YoutubeUrl = profile.YoutubeUrl,
+                ContractExpiringMonths = profile.ContractExpiringMonths
             };
             return Ok(dto);
         }
@@ -67,6 +68,8 @@ namespace FootballDashboardAPI.Controllers
                 return BadRequest(new { message = "Company name is required." });
             if (string.IsNullOrWhiteSpace(dto.Email))
                 return BadRequest(new { message = "Email is required." });
+            if (dto.ContractExpiringMonths <= 0)
+                return BadRequest(new { message = "Contract expiring months must be a positive number." });
             // Add more validation as needed
 
             var entity = await _repository.UpsertAsync(dto);

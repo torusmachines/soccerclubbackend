@@ -67,6 +67,7 @@ public class NoteRepository : INoteRepository
 
     public async Task<Note> CreateAsync(Note note)
     {
+        // Call old fn_notes_insert signature (without is_visible_to_player) for backward compatibility
         await _db.ExecuteNonQueryAsync(
             "SELECT stf.fn_notes_insert(@p_note_id, @p_topic, @p_description, @p_category, @p_created_by_scout_id, @p_created_at, @p_player_id, @p_club_id, @p_follow_up_date)",
             new NpgsqlParameter("p_note_id", NpgsqlDbType.Varchar)
@@ -89,6 +90,20 @@ public class NoteRepository : INoteRepository
             { Value = note.FollowUpDate == null ? DBNull.Value : (object)note.FollowUpDate }
         );
 
+        // Ensure is_visible_to_player column is updated if DB supports it
+        try
+        {
+            await _db.ExecuteNonQueryAsync(
+                "UPDATE stf.notes SET is_visible_to_player = @p_is_visible_to_player WHERE note_id = @p_note_id",
+                new NpgsqlParameter("p_is_visible_to_player", NpgsqlDbType.Boolean) { Value = note.IsVisibleToPlayer },
+                new NpgsqlParameter("p_note_id", NpgsqlDbType.Varchar) { Value = note.NoteId }
+            );
+        }
+        catch (PostgresException) // if the column doesn't exist or function etc.
+        {
+            // Ignore; new DB schema may not be applied yet.
+        }
+
         return await GetByIdAsync(note.NoteId) ?? note;
     }
 
@@ -108,6 +123,21 @@ public class NoteRepository : INoteRepository
             { Value = note.FollowUpDate == null ? DBNull.Value : (object)note.FollowUpDate }
         );
 
+        // Update visibility after update, for migrations where the stored proc is not yet changed
+        try
+        {
+            await _db.ExecuteNonQueryAsync(
+                "UPDATE stf.notes SET is_visible_to_player = @p_is_visible_to_player WHERE note_id = @p_note_id",
+                new NpgsqlParameter("p_is_visible_to_player", NpgsqlDbType.Boolean) { Value = note.IsVisibleToPlayer },
+                new NpgsqlParameter("p_note_id", NpgsqlDbType.Varchar) { Value = note.NoteId }
+            );
+        }
+        catch (PostgresException)
+        {
+            // Ignore for legacy DB schema.
+        }
+
+
         return await GetByIdAsync(note.NoteId);
     }
 
@@ -122,6 +152,23 @@ public class NoteRepository : INoteRepository
 
     private Note MapReaderToNote(NpgsqlDataReader reader)
     {
+        bool hasIsVisibleToPlayer = false;
+        bool isVisibleToPlayer = false;
+
+        try
+        {
+            hasIsVisibleToPlayer = reader.GetOrdinal("is_visible_to_player") >= 0;
+        }
+        catch (IndexOutOfRangeException)
+        {
+            hasIsVisibleToPlayer = false;
+        }
+
+        if (hasIsVisibleToPlayer)
+        {
+            isVisibleToPlayer = reader["is_visible_to_player"] == DBNull.Value ? false : (bool)reader["is_visible_to_player"];
+        }
+
         return new Note
         {
             NoteId = reader["note_id"].ToString()!,
@@ -131,6 +178,7 @@ public class NoteRepository : INoteRepository
             Description = reader["description"].ToString()!,
             Category = reader["category"].ToString()!,
             FollowUpDate = reader["follow_up_date"] == DBNull.Value ? null : (DateOnly?)DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("follow_up_date"))),
+            IsVisibleToPlayer = isVisibleToPlayer,
             CreatedByScoutId = reader["created_by_scout_id"].ToString()!,
             CreatedAt = (DateTime)reader["created_at"]
         };
