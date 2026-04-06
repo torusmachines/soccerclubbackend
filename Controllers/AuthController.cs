@@ -235,7 +235,7 @@ public class AuthController : ControllerBase
 
     private async System.Threading.Tasks.Task SendInviteEmailAsync(string email, string fullName, string role, string inviteToken)
     {
-        var frontendUrl = _config["FrontendUrl"] ?? "http://localhost:5173";
+        var frontendUrl = _config["FrontendUrl"] ?? "https://soccerclubfrontend.onrender.com/#/";
         var inviteLink = $"{frontendUrl}/accept-invite?token={Uri.EscapeDataString(inviteToken)}";
         var emailHtml = BuildInviteEmailHtml(fullName, role, inviteLink);
 
