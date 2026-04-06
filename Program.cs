@@ -173,7 +173,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
 
@@ -187,4 +187,5 @@ app.UseStaticFiles();
 
 
 Console.WriteLine("Application starting...");
-app.Run();
+//app.Run();
+app.Run($"http://0.0.0.0:1000");
