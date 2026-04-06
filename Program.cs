@@ -95,7 +95,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
     {
         policy.WithOrigins(
-                "https://localhost:8080", "https://soccerclubbackend.onrender.com", "http://localhost:8080", "http://soccerclubbackend.onrender.com", "localhost:8080")
+                "https://localhost:8080", "https://soccerclubbackend.onrender.com", "http://localhost:8080", "http://soccerclubbackend.onrender.com", "localhost:8080", "https://soccerclubfrontend.onrender.com", "http://soccerclubfrontend.onrender.com")
               .AllowAnyHeader()
               .AllowAnyMethod()
               //.AllowCredentials()
