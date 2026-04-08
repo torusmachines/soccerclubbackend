@@ -23,6 +23,19 @@ public class DocumentsController : ControllerBase
         return Ok(await _service.GetAllAsync());
     }
 
+    [HttpGet("player/{playerId}")]
+    public async Task<IActionResult> GetByPlayer(string playerId)
+    {
+        var documents = await _service.GetByPlayerIdAsync(playerId);
+
+        if (User.IsInRole("Player"))
+        {
+            documents = documents.Where(doc => doc.IsVisibleToPlayer).ToList();
+        }
+
+        return Ok(documents);
+    }
+
     //[HttpGet("{id}")]
     //public async Task<IActionResult> Get(string id)
     //{

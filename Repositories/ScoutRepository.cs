@@ -41,10 +41,10 @@ public class ScoutRepository : IScoutRepository
         await _db.ExecuteNonQueryAsync(
             @"INSERT INTO stf.scouts (
                   scout_id, scout_name, role_name, first_name, last_name, email, phone_number,
-                  address_line1, address_line2, city, state, postal_code, country, created_at
+                  address_line1, address_line2, city, state, postal_code, country, locked_areas, is_show_player, created_at
               ) VALUES (
                   @p_scout_id, @p_scout_name, @p_role_name, @p_first_name, @p_last_name, @p_email, @p_phone_number,
-                  @p_address_line1, @p_address_line2, @p_city, @p_state, @p_postal_code, @p_country, @p_created_at
+                  @p_address_line1, @p_address_line2, @p_city, @p_state, @p_postal_code, @p_country, @p_locked_areas, @p_is_show_player, @p_created_at
               )",
             new NpgsqlParameter("p_scout_id", NpgsqlDbType.Varchar)
             { Value = scout.ScoutId },
@@ -72,6 +72,10 @@ public class ScoutRepository : IScoutRepository
             { Value = (object?)scout.PostalCode ?? DBNull.Value },
             new NpgsqlParameter("p_country", NpgsqlDbType.Varchar)
             { Value = (object?)scout.Country ?? DBNull.Value },
+            new NpgsqlParameter("p_locked_areas", NpgsqlDbType.Text)
+            { Value = (object?)scout.LockedAreas ?? DBNull.Value },
+            new NpgsqlParameter("p_is_show_player", NpgsqlDbType.Boolean)
+            { Value = scout.IsShowPlayer },
             new NpgsqlParameter("p_created_at", NpgsqlDbType.Timestamp)
             { Value = DateTime.SpecifyKind(scout.CreatedAt, DateTimeKind.Unspecified) }
         );
@@ -94,7 +98,9 @@ public class ScoutRepository : IScoutRepository
                   city = @p_city,
                   state = @p_state,
                   postal_code = @p_postal_code,
-                  country = @p_country
+                  country = @p_country,
+                  locked_areas = @p_locked_areas,
+                  is_show_player = @p_is_show_player
               WHERE scout_id = @p_scout_id",
             new NpgsqlParameter("p_scout_id", NpgsqlDbType.Varchar)
             { Value = scout.ScoutId },
@@ -121,7 +127,11 @@ public class ScoutRepository : IScoutRepository
             new NpgsqlParameter("p_postal_code", NpgsqlDbType.Varchar)
             { Value = (object?)scout.PostalCode ?? DBNull.Value },
             new NpgsqlParameter("p_country", NpgsqlDbType.Varchar)
-            { Value = (object?)scout.Country ?? DBNull.Value }
+            { Value = (object?)scout.Country ?? DBNull.Value },
+            new NpgsqlParameter("p_locked_areas", NpgsqlDbType.Text)
+            { Value = (object?)scout.LockedAreas ?? DBNull.Value },
+            new NpgsqlParameter("p_is_show_player", NpgsqlDbType.Boolean)
+            { Value = scout.IsShowPlayer }
         );
 
         return await GetByIdAsync(scout.ScoutId);
@@ -183,6 +193,8 @@ public class ScoutRepository : IScoutRepository
             State = reader["state"] as string,
             PostalCode = reader["postal_code"] as string,
             Country = reader["country"] as string,
+            LockedAreas = reader["locked_areas"] as string,
+            IsShowPlayer = reader["is_show_player"] != DBNull.Value && (bool)reader["is_show_player"],
             CreatedAt = (DateTime)reader["created_at"]
         };
     }

@@ -11,10 +11,12 @@ namespace FootballDashboardAPI.Controllers;
 public class ScoutsController : ControllerBase
 {
     private readonly IScoutService _scoutService;
+    private readonly ILogger<ScoutsController> _logger;
 
-    public ScoutsController(IScoutService scoutService)
+    public ScoutsController(IScoutService scoutService, ILogger<ScoutsController> logger)
     {
         _scoutService = scoutService;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -40,6 +42,7 @@ public class ScoutsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Scout>> CreateScout(CreateScout createScoutDto)
     {
+        _logger.LogInformation("CreateScout API received lockedAreas={LockedAreas}", createScoutDto.LockedAreas);
         try
         {
             var scout = await _scoutService.CreateScoutAsync(createScoutDto);
@@ -54,6 +57,7 @@ public class ScoutsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<Scout>> UpdateScout(string id, UpdateScout updateScoutDto)
     {
+        _logger.LogInformation("UpdateScout API received id={Id} lockedAreas={LockedAreas}", id, updateScoutDto.LockedAreas);
         try
         {
             var scout = await _scoutService.UpdateScoutAsync(id, updateScoutDto);

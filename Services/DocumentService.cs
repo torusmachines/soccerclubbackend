@@ -22,6 +22,15 @@ public class DocumentService : IDocumentService
         );
     }
 
+    public async Task<IEnumerable<Document>> GetByPlayerIdAsync(string playerId)
+    {
+        return await _db.ExecuteQueryListAsync(
+            "SELECT * FROM stf.fn_documents_get_all() WHERE player_id = @p_player_id",
+            MapReaderToDocument,
+            new NpgsqlParameter("p_player_id", NpgsqlDbType.Varchar) { Value = playerId }
+        );
+    }
+
     public async Task<Document?> GetByIdAsync(string id)
     {
         return await _db.ExecuteQuerySingleAsync(
@@ -47,7 +56,7 @@ public class DocumentService : IDocumentService
         var createdAt = DateTime.UtcNow;
 
         await _db.ExecuteNonQueryAsync(
-            "SELECT stf.fn_documents_insert(@p_document_id, @p_document_name, @p_document_type, @p_document_date, @p_created_at, @p_file_data, @p_player_id, @p_club_id, @p_file_size_label)",
+            "SELECT stf.fn_documents_insert(@p_document_id, @p_document_name, @p_document_type, @p_document_date, @p_created_at, @p_file_data, @p_player_id, @p_club_id, @p_file_size_label, @p_file_extension, @p_is_visible_to_player)",
             new NpgsqlParameter("p_document_id", NpgsqlDbType.Varchar)
             { Value = id },
             new NpgsqlParameter("p_document_name", NpgsqlDbType.Varchar)
@@ -65,7 +74,11 @@ public class DocumentService : IDocumentService
             new NpgsqlParameter("p_club_id", NpgsqlDbType.Varchar)
             { Value = dto.ClubId == null ? DBNull.Value : (object)dto.ClubId },
             new NpgsqlParameter("p_file_size_label", NpgsqlDbType.Varchar)
-            { Value = dto.FileSizeLabel == null ? DBNull.Value : (object)dto.FileSizeLabel }
+            { Value = dto.FileSizeLabel == null ? DBNull.Value : (object)dto.FileSizeLabel },
+            new NpgsqlParameter("p_file_extension", NpgsqlDbType.Varchar)
+            { Value = DBNull.Value }, // Assuming no extension for now
+            new NpgsqlParameter("p_is_visible_to_player", NpgsqlDbType.Boolean)
+            { Value = dto.IsVisibleToPlayer }
         );
 
         return await GetByIdAsync(id) ?? new Document
@@ -80,7 +93,7 @@ public class DocumentService : IDocumentService
     public async Task<bool> UpdateAsync(string id, UpdateDocument dto)
     {
         var result = await _db.ExecuteScalarAsync(
-            "SELECT stf.fn_documents_update(@p_document_id, @p_document_name, @p_document_type, @p_document_date, @p_file_data, @p_player_id, @p_club_id, @p_file_size_label)",
+            "SELECT stf.fn_documents_update(@p_document_id, @p_document_name, @p_document_type, @p_document_date, @p_file_data, @p_player_id, @p_club_id, @p_file_size_label, @p_file_extension, @p_is_visible_to_player)",
             new NpgsqlParameter("p_document_id", NpgsqlDbType.Varchar)
             { Value = id },
             new NpgsqlParameter("p_document_name", NpgsqlDbType.Varchar)
@@ -96,7 +109,11 @@ public class DocumentService : IDocumentService
             new NpgsqlParameter("p_club_id", NpgsqlDbType.Varchar)
             { Value = dto.ClubId == null ? DBNull.Value : (object)dto.ClubId },
             new NpgsqlParameter("p_file_size_label", NpgsqlDbType.Varchar)
-            { Value = dto.FileSizeLabel == null ? DBNull.Value : (object)dto.FileSizeLabel }
+            { Value = dto.FileSizeLabel == null ? DBNull.Value : (object)dto.FileSizeLabel },
+            new NpgsqlParameter("p_file_extension", NpgsqlDbType.Varchar)
+            { Value = DBNull.Value },
+            new NpgsqlParameter("p_is_visible_to_player", NpgsqlDbType.Boolean)
+            { Value = dto.IsVisibleToPlayer == null ? DBNull.Value : (object)dto.IsVisibleToPlayer }
         );
 
         return Convert.ToInt32(result ?? 0) > 0;
@@ -123,7 +140,8 @@ public class DocumentService : IDocumentService
             DocumentDate = reader["document_date"] == DBNull.Value ? default : (DateTime)reader["document_date"],
             FileSizeLabel = reader["file_size_label"] == DBNull.Value ? null : reader["file_size_label"].ToString(),
             FileData = reader["file_data"] == DBNull.Value ? null : (byte[])reader["file_data"],
-            CreatedAt = (DateTime)reader["created_at"]
+            CreatedAt = (DateTime)reader["created_at"],
+            IsVisibleToPlayer = reader["is_visible_to_player"] == DBNull.Value ? false : (bool)reader["is_visible_to_player"]
         };
     }
 }

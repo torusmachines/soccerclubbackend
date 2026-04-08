@@ -42,6 +42,9 @@ public partial class Document
     [Precision(0)]
     public DateTime CreatedAt { get; set; }
 
+    [Column("is_visible_to_player")]
+    public bool IsVisibleToPlayer { get; set; }
+
     [ForeignKey("ClubId")]
     [InverseProperty("Documents")]
     public virtual Club? Club { get; set; }
@@ -68,6 +71,8 @@ public class CreateDocument
     public string? FileSizeLabel { get; set; }
 
     public byte[] FileData { get; set; } = null!;
+
+    public bool IsVisibleToPlayer { get; set; }
 }
 
 
@@ -84,4 +89,6 @@ public class UpdateDocument
     public string? FileSizeLabel { get; set; }
 
     public byte[]? FileData { get; set; }
+
+    public bool? IsVisibleToPlayer { get; set; }
 }

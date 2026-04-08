@@ -58,6 +58,8 @@ public class ScoutService : IScoutService
             State = createScoutDto.State,
             PostalCode = createScoutDto.PostalCode,
             Country = createScoutDto.Country,
+            LockedAreas = createScoutDto.LockedAreas,
+            IsShowPlayer = createScoutDto.IsShowPlayer ?? false,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -91,6 +93,8 @@ public class ScoutService : IScoutService
             State = updateScoutDto.State,
             PostalCode = updateScoutDto.PostalCode,
             Country = updateScoutDto.Country,
+            LockedAreas = updateScoutDto.LockedAreas,
+            IsShowPlayer = updateScoutDto.IsShowPlayer ?? existingScout.IsShowPlayer,
             CreatedAt = existingScout.CreatedAt
         };
 
@@ -124,6 +128,8 @@ public class ScoutService : IScoutService
             State = scout.State,
             PostalCode = scout.PostalCode,
             Country = scout.Country,
+            LockedAreas = scout.LockedAreas,
+            IsShowPlayer = scout.IsShowPlayer,
             CreatedAt = scout.CreatedAt
         };
     }

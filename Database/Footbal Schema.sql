@@ -684,6 +684,143 @@ $$;
 ALTER FUNCTION stf.fn_club_contacts_update(p_club_contact_id character varying, p_club_id character varying, p_contact_name character varying, p_role_name character varying, p_email character varying, p_phone character varying) OWNER TO postgres;
 
 --
+-- TOC entry 285 (class 1255 OID 18899)
+-- Name: fn_contact_roles_delete(character varying); Type: FUNCTION; Schema: stf; Owner: postgres
+--
+
+CREATE FUNCTION stf.fn_contact_roles_delete(p_id character varying) RETURNS integer
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    v_affected INTEGER;
+BEGIN
+    DELETE FROM stf.contact_roles
+    WHERE role_id = p_id;
+
+    GET DIAGNOSTICS v_affected = ROW_COUNT;
+    RETURN v_affected;
+END;
+$$;
+
+
+ALTER FUNCTION stf.fn_contact_roles_delete(p_id character varying) OWNER TO postgres;
+
+--
+-- TOC entry 286 (class 1255 OID 18900)
+-- Name: fn_contact_roles_get_all(); Type: FUNCTION; Schema: stf; Owner: postgres
+--
+
+CREATE FUNCTION stf.fn_contact_roles_get_all() RETURNS TABLE(role_id character varying, role_name character varying, description text, created_at timestamp without time zone, created_by character varying)
+    LANGUAGE sql STABLE
+    AS $$
+    SELECT
+        role_id,
+        role_name,
+        description,
+        created_at,
+        created_by
+    FROM stf.contact_roles
+    ORDER BY role_name;
+$$;
+
+
+ALTER FUNCTION stf.fn_contact_roles_get_all() OWNER TO postgres;
+
+--
+-- TOC entry 287 (class 1255 OID 18901)
+-- Name: fn_contact_roles_get_by_id(character varying); Type: FUNCTION; Schema: stf; Owner: postgres
+--
+
+CREATE FUNCTION stf.fn_contact_roles_get_by_id(p_id character varying) RETURNS TABLE(role_id character varying, role_name character varying, description text, created_at timestamp without time zone, created_by character varying)
+    LANGUAGE sql STABLE
+    AS $$
+    SELECT
+        role_id,
+        role_name,
+        description,
+        created_at,
+        created_by
+    FROM stf.contact_roles
+    WHERE role_id = p_id;
+$$;
+
+
+ALTER FUNCTION stf.fn_contact_roles_get_by_id(p_id character varying) OWNER TO postgres;
+
+--
+-- TOC entry 288 (class 1255 OID 18902)
+-- Name: fn_contact_roles_get_by_name(character varying); Type: FUNCTION; Schema: stf; Owner: postgres
+--
+
+CREATE FUNCTION stf.fn_contact_roles_get_by_name(p_name character varying) RETURNS TABLE(role_id character varying, role_name character varying, description text, created_at timestamp without time zone, created_by character varying)
+    LANGUAGE sql STABLE
+    AS $$
+    SELECT
+        role_id,
+        role_name,
+        description,
+        created_at,
+        created_by
+    FROM stf.contact_roles
+    WHERE role_name = p_name;
+$$;
+
+
+ALTER FUNCTION stf.fn_contact_roles_get_by_name(p_name character varying) OWNER TO postgres;
+
+--
+-- TOC entry 289 (class 1255 OID 18903)
+-- Name: fn_contact_roles_insert(character varying, character varying, timestamp without time zone, character varying); Type: FUNCTION; Schema: stf; Owner: postgres
+--
+
+CREATE FUNCTION stf.fn_contact_roles_insert(p_role_id character varying, p_role_name character varying, p_description text, p_created_at timestamp without time zone, p_created_by character varying) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    INSERT INTO stf.contact_roles (
+        role_id,
+        role_name,
+        description,
+        created_at,
+        created_by
+    ) VALUES (
+        p_role_id,
+        p_role_name,
+        p_description,
+        p_created_at,
+        p_created_by
+    );
+END;
+$$;
+
+
+ALTER FUNCTION stf.fn_contact_roles_insert(p_role_id character varying, p_role_name character varying, p_created_at timestamp without time zone, p_created_by character varying) OWNER TO postgres;
+
+--
+-- TOC entry 290 (class 1255 OID 18904)
+-- Name: fn_contact_roles_update(character varying, character varying); Type: FUNCTION; Schema: stf; Owner: postgres
+--
+
+CREATE FUNCTION stf.fn_contact_roles_update(p_role_id character varying, p_role_name character varying, p_description text) RETURNS integer
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    v_affected INTEGER;
+BEGIN
+    UPDATE stf.contact_roles
+    SET role_name = p_role_name,
+        description = p_description
+    WHERE role_id = p_role_id;
+
+    GET DIAGNOSTICS v_affected = ROW_COUNT;
+    RETURN v_affected;
+END;
+$$;
+
+
+ALTER FUNCTION stf.fn_contact_roles_update(p_role_id character varying, p_role_name character varying) OWNER TO postgres;
+
+--
 -- TOC entry 284 (class 1255 OID 18898)
 -- Name: fn_clubs_delete(character varying); Type: FUNCTION; Schema: stf; Owner: postgres
 --
@@ -881,7 +1018,7 @@ ALTER FUNCTION stf.fn_documents_exists(p_id character varying) OWNER TO postgres
 -- Name: fn_documents_get_all(); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.fn_documents_get_all() RETURNS TABLE(document_id character varying, player_id character varying, club_id character varying, document_name character varying, document_type character varying, document_date timestamp without time zone, file_size_label character varying, file_data bytea, file_extension character varying, created_at timestamp without time zone)
+CREATE FUNCTION stf.fn_documents_get_all() RETURNS TABLE(document_id character varying, player_id character varying, club_id character varying, document_name character varying, document_type character varying, document_date timestamp without time zone, file_size_label character varying, file_data bytea, file_extension character varying, created_at timestamp without time zone, is_visible_to_player boolean)
     LANGUAGE sql STABLE
     AS $$
     SELECT
@@ -894,7 +1031,8 @@ CREATE FUNCTION stf.fn_documents_get_all() RETURNS TABLE(document_id character v
         file_size_label,
         file_data,
         file_extension,
-        created_at
+        created_at,
+        is_visible_to_player
     FROM stf.documents
     ORDER BY created_at DESC;
 $$;
@@ -907,7 +1045,7 @@ ALTER FUNCTION stf.fn_documents_get_all() OWNER TO postgres;
 -- Name: fn_documents_get_by_id(character varying); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.fn_documents_get_by_id(p_id character varying) RETURNS TABLE(document_id character varying, player_id character varying, club_id character varying, document_name character varying, document_type character varying, document_date timestamp without time zone, file_size_label character varying, file_data bytea, file_extension character varying, created_at timestamp without time zone)
+CREATE FUNCTION stf.fn_documents_get_by_id(p_id character varying) RETURNS TABLE(document_id character varying, player_id character varying, club_id character varying, document_name character varying, document_type character varying, document_date timestamp without time zone, file_size_label character varying, file_data bytea, file_extension character varying, created_at timestamp without time zone, is_visible_to_player boolean)
     LANGUAGE sql STABLE
     AS $$
     SELECT
@@ -920,7 +1058,8 @@ CREATE FUNCTION stf.fn_documents_get_by_id(p_id character varying) RETURNS TABLE
         file_size_label,
         file_data,
         file_extension,
-        created_at
+        created_at,
+        is_visible_to_player
     FROM stf.documents
     WHERE document_id = p_id;
 $$;
@@ -933,7 +1072,7 @@ ALTER FUNCTION stf.fn_documents_get_by_id(p_id character varying) OWNER TO postg
 -- Name: fn_documents_insert(character varying, character varying, character varying, timestamp without time zone, timestamp without time zone, bytea, character varying, character varying, character varying, character varying); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.fn_documents_insert(p_document_id character varying, p_document_name character varying, p_document_type character varying, p_document_date timestamp without time zone, p_created_at timestamp without time zone, p_file_data bytea DEFAULT NULL::bytea, p_player_id character varying DEFAULT NULL::character varying, p_club_id character varying DEFAULT NULL::character varying, p_file_size_label character varying DEFAULT NULL::character varying, p_file_extension character varying DEFAULT NULL::character varying) RETURNS void
+CREATE FUNCTION stf.fn_documents_insert(p_document_id character varying, p_document_name character varying, p_document_type character varying, p_document_date timestamp without time zone, p_created_at timestamp without time zone, p_file_data bytea DEFAULT NULL::bytea, p_player_id character varying DEFAULT NULL::character varying, p_club_id character varying DEFAULT NULL::character varying, p_file_size_label character varying DEFAULT NULL::character varying, p_file_extension character varying DEFAULT NULL::character varying, p_is_visible_to_player boolean DEFAULT false) RETURNS void
     LANGUAGE sql
     AS $$
     INSERT INTO stf.documents (
@@ -946,7 +1085,8 @@ CREATE FUNCTION stf.fn_documents_insert(p_document_id character varying, p_docum
         file_size_label,
         file_data,
         file_extension,
-        created_at
+        created_at,
+        is_visible_to_player
     )
     VALUES (
         p_document_id,
@@ -958,19 +1098,20 @@ CREATE FUNCTION stf.fn_documents_insert(p_document_id character varying, p_docum
         p_file_size_label,
         p_file_data,
         p_file_extension,
-        p_created_at
+        p_created_at,
+        p_is_visible_to_player
     );
 $$;
 
 
-ALTER FUNCTION stf.fn_documents_insert(p_document_id character varying, p_document_name character varying, p_document_type character varying, p_document_date timestamp without time zone, p_created_at timestamp without time zone, p_file_data bytea, p_player_id character varying, p_club_id character varying, p_file_size_label character varying, p_file_extension character varying) OWNER TO postgres;
+ALTER FUNCTION stf.fn_documents_insert(p_document_id character varying, p_document_name character varying, p_document_type character varying, p_document_date timestamp without time zone, p_created_at timestamp without time zone, p_file_data bytea, p_player_id character varying, p_club_id character varying, p_file_size_label character varying, p_file_extension character varying, p_is_visible_to_player boolean) OWNER TO postgres;
 
 --
 -- TOC entry 301 (class 1255 OID 19056)
 -- Name: fn_documents_update(character varying, character varying, character varying, timestamp without time zone, bytea, character varying, character varying, character varying, character varying); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.fn_documents_update(p_document_id character varying, p_document_name character varying, p_document_type character varying, p_document_date timestamp without time zone, p_file_data bytea DEFAULT NULL::bytea, p_player_id character varying DEFAULT NULL::character varying, p_club_id character varying DEFAULT NULL::character varying, p_file_size_label character varying DEFAULT NULL::character varying, p_file_extension character varying DEFAULT NULL::character varying) RETURNS integer
+CREATE FUNCTION stf.fn_documents_update(p_document_id character varying, p_document_name character varying, p_document_type character varying, p_document_date timestamp without time zone, p_file_data bytea DEFAULT NULL::bytea, p_player_id character varying DEFAULT NULL::character varying, p_club_id character varying DEFAULT NULL::character varying, p_file_size_label character varying DEFAULT NULL::character varying, p_file_extension character varying DEFAULT NULL::character varying, p_is_visible_to_player boolean DEFAULT NULL) RETURNS integer
     LANGUAGE plpgsql
     AS $$
 DECLARE
@@ -978,14 +1119,15 @@ DECLARE
 BEGIN
     UPDATE stf.documents
     SET
-        player_id       = p_player_id,
-        club_id         = p_club_id,
-        document_name   = p_document_name,
-        document_type   = p_document_type,
-        document_date   = p_document_date,
-        file_size_label = p_file_size_label,
-        file_data       = p_file_data,
-        file_extension  = p_file_extension
+        player_id       = COALESCE(p_player_id, player_id),
+        club_id         = COALESCE(p_club_id, club_id),
+        document_name   = COALESCE(p_document_name, document_name),
+        document_type   = COALESCE(p_document_type, document_type),
+        document_date   = COALESCE(p_document_date, document_date),
+        file_size_label = COALESCE(p_file_size_label, file_size_label),
+        file_data       = COALESCE(p_file_data, file_data),
+        file_extension  = COALESCE(p_file_extension, file_extension),
+        is_visible_to_player = COALESCE(p_is_visible_to_player, is_visible_to_player)
     WHERE document_id = p_document_id;
 
     GET DIAGNOSTICS v_affected = ROW_COUNT;
@@ -994,7 +1136,7 @@ END;
 $$;
 
 
-ALTER FUNCTION stf.fn_documents_update(p_document_id character varying, p_document_name character varying, p_document_type character varying, p_document_date timestamp without time zone, p_file_data bytea, p_player_id character varying, p_club_id character varying, p_file_size_label character varying, p_file_extension character varying) OWNER TO postgres;
+ALTER FUNCTION stf.fn_documents_update(p_document_id character varying, p_document_name character varying, p_document_type character varying, p_document_date timestamp without time zone, p_file_data bytea, p_player_id character varying, p_club_id character varying, p_file_size_label character varying, p_file_extension character varying, p_is_visible_to_player boolean) OWNER TO postgres;
 
 --
 -- TOC entry 278 (class 1255 OID 19063)
@@ -3205,6 +3347,21 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
+-- TOC entry 228 (class 1259 OID 18675)
+-- Name: contact_roles; Type: TABLE; Schema: stf; Owner: postgres
+--
+
+CREATE TABLE stf.contact_roles (
+    role_id character varying(50) NOT NULL,
+    role_name character varying(100) NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    created_by character varying(50) NOT NULL
+);
+
+
+ALTER TABLE stf.contact_roles OWNER TO postgres;
+
+--
 -- TOC entry 229 (class 1259 OID 18684)
 -- Name: club_contacts; Type: TABLE; Schema: stf; Owner: postgres
 --
@@ -3615,6 +3772,10 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+ALTER TABLE ONLY stf.contact_roles
+    ADD CONSTRAINT contact_roles_pkey PRIMARY KEY (role_id);
 
 
 --

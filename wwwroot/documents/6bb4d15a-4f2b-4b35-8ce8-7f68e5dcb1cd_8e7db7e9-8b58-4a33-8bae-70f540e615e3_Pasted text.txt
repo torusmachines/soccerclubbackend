@@ -1,0 +1,67 @@
+Hey, Raymond.
+Hey, how's it going?
+Good, good. How are you?
+I'm doing well, thanks.
+Great. Hi, Raymond.
+How are you guys? How are you doing?
+Not bad at all.
+Awesome. Good to hear.
+How's your, day or your weekend, if I didn't talk to you?
+all pretty good.
+Oh, great.
+Raymond, we missed you yesterday, right?
+Yeah, yeah, yeah. I have a conflict on Mondays, so I'm going to have to figure that out.
+Yeah. Even myself, I was, thinking that probably we could, because in the beginning when I was, choosing this time, we didn't have everyone. And also, you know, I was not appointed, official project manager for this particular project. Now it is confirmed that I'm, you know, going to keep going with this one. For the foreseeable.
+Oh, great. Yeah.
+Yeah. So, it's been confirmed that, you know, the previous PM is not coming back, and I'm going to have you guys are stuck with me. Just basically say. Right? So, have you guys submitted your, you know, payment request to SAP or whatever, whoever is taking care of that?
+SAP?
+Yeah. I I was actually going to ask about that. The forms that Excel sheet that you said we should fill out, you want that done weekly? Yes. Like, by every Friday, like, that would be great.
+Okay.
+Yeah. So whatever. Like, if you are if you want to start, like, you know, throwing things, like, during the week, for example, today you do, like, you know, a two-hours thing on the project, you could throw it in there if you know, completed a file. You could just as well put it in there. And in the end, that would make it easy. Like, you know, it's like a.
+Yeah.
+Yeah, task-oriented, you know, thing there. And, basically, I finished, you know, the original one that I'm talking about. I just have to upload it, but I've been super swamped with, four projects right now, so I just have to figure out how to juggle in between the four projects.
+Yeah.
+It's yeah. Well, we'll see how to figure it out. And I understand that you guys have been working together.
+we met a couple of times last week, but this week I haven't we haven't met yet. I was hoping to have, what's his name? what's the gentleman's name? the guy who runs the salmon the data,
+Oh, okay. Is it James or Rick or?
+James. Yeah. Jim, Jim. That's his name, I think. Yep.
+Okay.
+So he can, answer some more questions for me, about salmon. when are we getting the BA into this?
+So for the BA, we don't have a BA at this particular point. Now, if you need anything from the BA, like I said before, you compile everything that you need from the BA, and I'll make sure that they answer to those. If that makes sense.
+Okay. Yeah. I, I that makes sense. Yeah.
+Yeah. Because, you know, well, basically, what I'm going to do is I'm going to fish for their time. And, you know, I can follow back and forth with them to trying to get answers. But officially, I cannot get any allocation from them.
+Okay.
+Yeah. So basically, I have questions if you have concerns. Now, if, for example, you're telling me we cannot move and we need, like, a BA, like, 20% of the time for this project, then that's a different, story, right?
+Yeah. Did we do, you guys, did you get your, your license?
+no, I haven't heard back from, I was actually wanting to follow up with, Lindsay. But, she did mention from my last conversation that, we are still waiting for the procurement. To complete, so.
+Okay.
+I'll follow up with her today and see. In fact, I'll just text her right now as we speak, so.
+All right.
+Good. Okay.
+So, go ahead, Raymond.
+Oh, I, I, I was going to say we should meet and but, and start talking like, yeah, we, we can assign him anything without his license to do anything, so, I'll just find something else we can do.
+Yeah. So basically, at this point, I think that I mentioned this to you guys, last week and early this week, my goal is for us to be, fully in alignment for, you know, the user stories. If there's anything that needs to be changed, like, you let me know, and then we go back to either the BA or the business.
+So but I need clarity on that, you know, by the end of this week. Also, we need alignment on the sprints, like, you know, what, are we building? How are we building it? And, you know, are we going to change the sprints and the backlog? If anything has to be done, we need to have clarity on that. Because right now, I am working on preparing for a kickoff meeting, with the business, and once we start, you know, bringing the business in this into this thing, that would be like, you know, a different type of, sprint where, you know, you guys open the sprints, the backlog, and show us what you've been doing, and then they can test probably on, on the spot or maybe take it away. But once we get that going, that means like, you know, every day's task needs to be completed.
+so I'm, attempting to have that happen late next week or early the week after. So if you can help me you know, have clarity on, okay, we're not going to be changing the user stories anymore, we're not going to be changing the sprints anymore, so that's basically what I need to be able to have a plan. And also, I'm preparing for a meeting with, the SMEs of the business. I already started the conversation with the sponsor and their project coordinator. So early next week or mid-next week, we will, you know, have one workshop or two workshops with them, so that you guys can experience, you know, the old software or the current software, how it works. So I asked them to bring in two SMEs, like, with different level of, accesses, so maybe a supervisor and, or just, like, a regular operational, agent. So yeah, like, everything is being put in place, but once we go past, you know, next week, that means like, you know, everybody would be he would have to be here on, the scrums, and also, you know, everything that we have in the sprints, like, you know, if it is daily, then we have to complete it, and also, you know, showcase it to the business, and they will either approve it or, you know, decline it or maybe take it away for testing. concern questions?
+Is that fair?
+yeah, that is, I mean, yeah, let me just yeah, just got to make sure you guys is, I said we just got to get you guys's, his access so we can.
+Yeah, no, definitely. I mean, that sounds good, and I'm, I've been preparing for it, Ibrahima and Raymond. trying to go through all of the user stories, making my notes. I did compile I, I, I was actually sending all of those, before, but I thought of, like, you know, just compile them for now, rather than spamming your inboxes. I have been maintaining the status on a daily basis, so yes, you know, yesterday I was working more on portal branding and payment management, so I got my understanding, my notes, and everything drafted here. today I was focusing more on the reporting system, the audit configuration, and security metrics for, Dynamics 365 and portal. So yeah, I, I, I mean, I've been preparing for the, you know, for the, you know, the meetings that are going to start next week or the week after. I'm yeah, that's totally fine.
+Sounds good. So now, do you guys think that they would be major changes to the sprints or ma-major changes to the, user stories?
+I mean, I'm just going through the user stories. Ibrahima, I don't think. I mean, there will be any changes. I mean, if there are any questions, I would definitely be happy to ask with the business, so that we get the proper understanding and go from there. But so far, yeah, I've been, you know, consuming or, you know, trying to digest all of the stories as much as possible, so that, you know, I, I'm not surprised at any stage, so yeah.
+Okay. Sounds good. So user stories seems to be and Raymond, how about you?
+Ready, questions, concerns? Is that fair as a timeline? It is. and I am ready. I, I don't have any major issues. As long as we can get the you guys aligned, we are, we can actually put that on paper.
+Yep. Yeah, sorry.
+And like, also, be aware that, like, you know, we're going to be getting because these are a lot of components to build, right? So we will have some developers that are coming, and we'll have, like, a business central, you know, expert there. but those are in the works, like, in the coming weeks, probably three or four weeks, down the road.
+Okay.
+Okay? So yeah, like, I mean, if you guys can, you know, meet up more and if you guys can, you know, finalize whatever that you can finalize, and in the end, like, you know, if you guys can just, you know, give me a brief note of everything that you've achieved for, you know, the past two weeks, that would be super great because, like, you know, you guys are meeting together. I don't know exactly what you're doing. You're just telling me that, you know, oh, we're getting this done. We're reviewing this. But, like, you know, I would want it, like, formalized where, you know, okay, this is what we've accomplished, and, you know, that would give me more confidence on the readiness of, going forward with, the kickoff meeting. And, because also, I think that I mentioned this to you guys because, you guys are looking back at the you-you're looking back at the user stories and maybe making some changes. Like, you know, am I run my, presentation by you before I, hold the meeting so that, you know, I'm not going to say crazy things there, you know, that are not accurate regarding the user stories or anything, or the milestones that we-we're trying to achieve, if that makes sense as well.
+Yeah, it does.
+Okay. Yep, good for me.
+Good? So that yeah, that's all I have, and, you know, keep up the good work and thanks for, you know, for your patience with me. And now, you know it's official. You guys are stuck with me for a little while. And, you know, unless something changes.
+Nope, happy to work with you, Ibrahima.
+Yeah, great. Thanks. Thanks, guys.
+All right. Thank you.
+All right.
+Bye-bye.
+Bye.
+Thank you. Bye.
+Sync with audio

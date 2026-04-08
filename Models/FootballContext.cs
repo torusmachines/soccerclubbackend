@@ -19,6 +19,8 @@ public partial class FootballContext : DbContext
 
     public virtual DbSet<ClubContact> ClubContacts { get; set; }
 
+    public virtual DbSet<ContactRole> ContactRoles { get; set; }
+
     public virtual DbSet<Document> Documents { get; set; }
 
     public virtual DbSet<Email> Emails { get; set; }
@@ -63,6 +65,14 @@ public partial class FootballContext : DbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
 
             entity.HasOne(d => d.Club).WithMany(p => p.ClubContacts).HasConstraintName("FK_club_contacts_club");
+        });
+
+        modelBuilder.Entity<ContactRole>(entity =>
+        {
+            entity.HasKey(e => e.RoleId).HasName("PK__contact_roles__role_id");
+
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
         });
 
         modelBuilder.Entity<Document>(entity =>

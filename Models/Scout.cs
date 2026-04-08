@@ -64,6 +64,12 @@ public partial class Scout
     [StringLength(100)]
     public string? Country { get; set; }
 
+    [Column("locked_areas")]
+    public string? LockedAreas { get; set; }
+
+    [Column("is_show_player")]
+    public bool IsShowPlayer { get; set; }
+
     [Column("created_at")]
     [Precision(0)]
     public DateTime CreatedAt { get; set; }
@@ -99,6 +105,8 @@ public class CreateScout
     public string? State { get; set; }
     public string? PostalCode { get; set; }
     public string? Country { get; set; }
+    public string? LockedAreas { get; set; }
+    public bool? IsShowPlayer { get; set; }
 }
 
 public class UpdateScout
@@ -115,4 +123,6 @@ public class UpdateScout
     public string? State { get; set; }
     public string? PostalCode { get; set; }
     public string? Country { get; set; }
+    public string? LockedAreas { get; set; }
+    public bool? IsShowPlayer { get; set; }
 }

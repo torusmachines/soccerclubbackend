@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,10 +16,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 //builder.Services.AddControllers();
 builder.Services.AddControllers()
-    .ConfigureApiBehaviorOptions(options =>
+    .AddJsonOptions(options =>
     {
-        options.SuppressModelStateInvalidFilter = true; // ADD THIS
-    });
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    })
+.ConfigureApiBehaviorOptions(options =>
+ {
+     options.SuppressModelStateInvalidFilter = true; // ADD THIS
+ });
+// Note: Removed SuppressModelStateInvalidFilter to allow proper error reporting
 
 //// Database Connection
 //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -80,6 +87,8 @@ builder.Services.AddScoped<ICompanyProfileRepository, CompanyProfileRepository>(
 // Register Services
 builder.Services.AddScoped<IClubService, ClubService>();
 builder.Services.AddScoped<IClubContactService, ClubContactService>();
+builder.Services.AddScoped<IContactRoleService, ContactRoleService>();
+builder.Services.AddScoped<IPlayerPositionService, PlayerPositionService>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IScoutService, ScoutService>();
 builder.Services.AddScoped<IUserService, UserService>();
