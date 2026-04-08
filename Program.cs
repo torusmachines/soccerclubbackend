@@ -152,7 +152,7 @@ builder.Services.AddSwaggerGen();
 
 // Email notification services
 builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>();
-builder.Services.AddHostedService<NotificationBackgroundService>();
+//builder.Services.AddHostedService<NotificationBackgroundService>();
 
 var app = builder.Build();
 
