@@ -16,8 +16,7 @@ public class ScoutRepository : IScoutRepository
     public async Task<IEnumerable<Scout>> GetAllAsync()
     {
         return await _db.ExecuteQueryListAsync(
-            //"SELECT * FROM stf.scouts WHERE \"IsDeleted\" IS NOT TRUE ORDER BY scout_id",
-            "SELECT * FROM stf.scouts ORDER BY scout_id",
+            "SELECT * FROM stf.scouts WHERE \"IsDeleted\" IS NOT TRUE ORDER BY scout_id",
             MapReaderToScout
         );
     }

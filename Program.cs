@@ -20,11 +20,11 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-    })
-.ConfigureApiBehaviorOptions(options =>
- {
-     options.SuppressModelStateInvalidFilter = true; // ADD THIS
- });
+    });
+//.ConfigureApiBehaviorOptions(options =>
+// {
+//     options.SuppressModelStateInvalidFilter = true; // ADD THIS
+// });
 // Note: Removed SuppressModelStateInvalidFilter to allow proper error reporting
 
 //// Database Connection

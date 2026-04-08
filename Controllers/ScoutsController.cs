@@ -30,7 +30,7 @@ public class ScoutsController : ControllerBase
     public async Task<ActionResult<Scout>> GetScout(string id)
     {
         var scout = await _scoutService.GetScoutByIdAsync(id);
-
+        
         if (scout == null)
         {
             return NotFound(new { message = $"Scout with ID '{id}' not found." });
@@ -61,7 +61,7 @@ public class ScoutsController : ControllerBase
         try
         {
             var scout = await _scoutService.UpdateScoutAsync(id, updateScoutDto);
-
+            
             if (scout == null)
             {
                 return NotFound(new { message = $"Scout with ID '{id}' not found." });
@@ -79,7 +79,7 @@ public class ScoutsController : ControllerBase
     public async Task<IActionResult> DeleteScout(string id)
     {
         var result = await _scoutService.DeleteScoutAsync(id);
-
+        
         if (!result)
         {
             return NotFound(new { message = $"Scout with ID '{id}' not found." });
