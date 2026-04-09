@@ -38,14 +38,37 @@ public class ReviewRatingsController : ControllerBase
 
     // POST: api/ReviewRatings
     [HttpPost]
-    public async Task<ActionResult<ReviewRating>> Create([FromBody] ReviewRating rating)
+    public async Task<ActionResult<ReviewRating>> Create([FromBody] CreateReviewRatingRequest request)
     {
+        if (request == null)
+        {
+            return BadRequest(new { message = "ReviewRating payload is required." });
+        }
+
+        if (string.IsNullOrWhiteSpace(request.ReviewId))
+        {
+            return BadRequest(new { message = "ReviewId is required." });
+        }
+
         try
         {
             // Check if rating already exists for this review
-            var exists = await _repository.ExistsAsync(rating.ReviewId);
+            var exists = await _repository.ExistsAsync(request.ReviewId);
             if (exists)
-                return Conflict(new { message = $"Rating for review '{rating.ReviewId}' already exists." });
+                return Conflict(new { message = $"Rating for review '{request.ReviewId}' already exists." });
+
+            var rating = new ReviewRating
+            {
+                ReviewId = request.ReviewId,
+                Passing = request.Passing,
+                Shooting = request.Shooting,
+                Dribbling = request.Dribbling,
+                TacticalAwareness = request.TacticalAwareness,
+                DefensiveContribution = request.DefensiveContribution,
+                PhysicalStrength = request.PhysicalStrength,
+                Behavior = request.Behavior,
+                OverallPerformance = request.OverallPerformance
+            };
 
             var created = await _repository.CreateAsync(rating);
             return CreatedAtAction(nameof(GetById), new { id = created.ReviewId }, created);
