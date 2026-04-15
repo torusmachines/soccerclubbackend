@@ -70,6 +70,15 @@ public partial class Player1
     [StringLength(500)]
     public string? ProfileImageUrl { get; set; }
 
+    [Column("sport_id")]
+    public int? SportId { get; set; }
+
+    [Column("contract_start_with_coach")]
+    public DateOnly? ContractStartWithCoach { get; set; }
+
+    [Column("contract_end_with_coach")]
+    public DateOnly? ContractEndWithCoach { get; set; }
+
     [Column("created_at")]
     [Precision(0)]
     public DateTime CreatedAt { get; set; }
@@ -86,6 +95,10 @@ public partial class Player1
     [InverseProperty("Player1s")]
     public virtual Club? CurrentClub { get; set; }
 
+    [ForeignKey("SportId")]
+    [InverseProperty("Player1s")]
+    public virtual Sport? Sport { get; set; }
+
     [InverseProperty("Player")]
     public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
 
@@ -97,7 +110,8 @@ public partial class Player1
 
     [InverseProperty("Player")]
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
-
+    [InverseProperty("Player")]
+    public virtual ICollection<PlayerAiPlan> PlayerAiPlans { get; set; } = new List<PlayerAiPlan>();
     [InverseProperty("Player")]
     public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
 }

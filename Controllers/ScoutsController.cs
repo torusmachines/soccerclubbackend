@@ -39,6 +39,13 @@ public class ScoutsController : ControllerBase
         return Ok(scout);
     }
 
+    [HttpGet("BySport/{sportId}")]
+    public async Task<ActionResult<IEnumerable<Scout>>> GetScoutsBySportId(int sportId)
+    {
+        var scouts = await _scoutService.GetScoutsBySportIdAsync(sportId);
+        return Ok(scouts);
+    }
+
     [HttpPost]
     public async Task<ActionResult<Scout>> CreateScout(CreateScout createScoutDto)
     {

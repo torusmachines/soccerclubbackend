@@ -152,21 +152,19 @@ public class NoteRepository : INoteRepository
 
     private Note MapReaderToNote(NpgsqlDataReader reader)
     {
-        bool hasIsVisibleToPlayer = false;
         bool isVisibleToPlayer = false;
 
-        try
+        // Check if column exists by looking at the field count
+        for (int i = 0; i < reader.FieldCount; i++)
         {
-            hasIsVisibleToPlayer = reader.GetOrdinal("is_visible_to_player") >= 0;
-        }
-        catch (IndexOutOfRangeException)
-        {
-            hasIsVisibleToPlayer = false;
-        }
-
-        if (hasIsVisibleToPlayer)
-        {
-            isVisibleToPlayer = reader["is_visible_to_player"] == DBNull.Value ? false : (bool)reader["is_visible_to_player"];
+            if (reader.GetName(i).Equals("is_visible_to_player", StringComparison.OrdinalIgnoreCase))
+            {
+                if (reader[i] != DBNull.Value)
+                {
+                    isVisibleToPlayer = (bool)reader[i];
+                }
+                break;
+            }
         }
 
         return new Note

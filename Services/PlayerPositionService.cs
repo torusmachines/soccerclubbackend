@@ -1,4 +1,5 @@
 using FootballDashboardAPI.Models;
+using FootballDashboardAPI.Models;
 using FootballDashboardAPI.Repositories;
 using Npgsql;
 using NpgsqlTypes;
@@ -31,6 +32,15 @@ public class PlayerPositionService : IPlayerPositionService
         );
     }
 
+    public async Task<IEnumerable<PlayerPosition>> GetBySportIdAsync(int sportId)
+    {
+        return await _db.ExecuteQueryListAsync(
+            "SELECT * FROM stf.player_positions WHERE sport_id = @p_sport_id ORDER BY position_code",
+            MapReaderToPlayerPosition,
+            new NpgsqlParameter("p_sport_id", NpgsqlDbType.Integer) { Value = sportId }
+        );
+    }
+
     public async Task<PlayerPosition> CreateAsync(CreatePlayerPosition dto, string createdBy)
     {
         // Check if position code already exists
@@ -56,12 +66,30 @@ public class PlayerPositionService : IPlayerPositionService
             new NpgsqlParameter("p_created_by", NpgsqlDbType.Varchar) { Value = createdBy }
         );
 
+        // Update sport_id if provided
+        if (dto.SportId.HasValue)
+        {
+            try
+            {
+                await _db.ExecuteNonQueryAsync(
+                    "UPDATE stf.player_positions SET sport_id = @p_sport_id WHERE position_id = @p_position_id",
+                    new NpgsqlParameter("p_sport_id", NpgsqlDbType.Integer) { Value = dto.SportId.Value },
+                    new NpgsqlParameter("p_position_id", NpgsqlDbType.Varchar) { Value = positionId }
+                );
+            }
+            catch (PostgresException)
+            {
+                // Ignore if column doesn't exist yet
+            }
+        }
+
         return await GetByIdAsync(positionId) ?? new PlayerPosition
         {
             PositionId = positionId,
             PositionCode = dto.PositionCode,
             PositionName = dto.PositionName,
             Description = dto.Description,
+            SportId = dto.SportId,
             CreatedAt = createdAt,
             CreatedBy = createdBy
         };
@@ -90,6 +118,23 @@ public class PlayerPositionService : IPlayerPositionService
             new NpgsqlParameter("p_position_name", NpgsqlDbType.Varchar) { Value = dto.PositionName },
             new NpgsqlParameter("p_description", NpgsqlDbType.Text) { Value = (object?)dto.Description ?? DBNull.Value }
         );
+
+        // Update sport_id if provided
+        if (dto.SportId.HasValue)
+        {
+            try
+            {
+                await _db.ExecuteNonQueryAsync(
+                    "UPDATE stf.player_positions SET sport_id = @p_sport_id WHERE position_id = @p_position_id",
+                    new NpgsqlParameter("p_sport_id", NpgsqlDbType.Integer) { Value = dto.SportId.Value },
+                    new NpgsqlParameter("p_position_id", NpgsqlDbType.Varchar) { Value = id }
+                );
+            }
+            catch (PostgresException)
+            {
+                // Ignore if column doesn't exist yet
+            }
+        }
 
         return await GetByIdAsync(id);
     }
@@ -120,12 +165,27 @@ public class PlayerPositionService : IPlayerPositionService
 
     private static PlayerPosition MapReaderToPlayerPosition(NpgsqlDataReader reader)
     {
+        int? sportId = null;
+        try
+        {
+            var ordinal = reader.GetOrdinal("sport_id");
+            if (!reader.IsDBNull(ordinal))
+            {
+                sportId = reader.GetInt32(ordinal);
+            }
+        }
+        catch (IndexOutOfRangeException)
+        {
+            // Column doesn't exist, that's ok
+        }
+
         return new PlayerPosition
         {
             PositionId = reader.GetString(reader.GetOrdinal("position_id")),
             PositionCode = reader.GetString(reader.GetOrdinal("position_code")),
             PositionName = reader.GetString(reader.GetOrdinal("position_name")),
             Description = reader.IsDBNull(reader.GetOrdinal("description")) ? null : reader.GetString(reader.GetOrdinal("description")),
+            SportId = sportId,
             CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
             CreatedBy = reader.GetString(reader.GetOrdinal("created_by"))
         };

@@ -28,6 +28,16 @@ public class ScoutRepository : IScoutRepository
             new NpgsqlParameter("p_id", NpgsqlDbType.Varchar) { Value = id }
         );
     }
+
+    public async Task<IEnumerable<Scout>> GetBySportIdAsync(int sportId)
+    {
+        return await _db.ExecuteQueryListAsync(
+            "SELECT * FROM stf.scouts WHERE sport_id = @p_sport_id AND \"IsDeleted\" IS NOT TRUE ORDER BY scout_id",
+            MapReaderToScout,
+            new NpgsqlParameter("p_sport_id", NpgsqlDbType.Integer) { Value = sportId }
+        );
+    }
+
     public async Task<string?> GetMaxScoutIdAsync()
     {
         var result = await _db.ExecuteScalarAsync(
@@ -41,10 +51,10 @@ public class ScoutRepository : IScoutRepository
         await _db.ExecuteNonQueryAsync(
             @"INSERT INTO stf.scouts (
                   scout_id, scout_name, role_name, first_name, last_name, email, phone_number,
-                  address_line1, address_line2, city, state, postal_code, country, locked_areas, is_show_player, created_at
+                  address_line1, address_line2, city, state, postal_code, country, locked_areas, is_show_player, sport_id, created_at
               ) VALUES (
                   @p_scout_id, @p_scout_name, @p_role_name, @p_first_name, @p_last_name, @p_email, @p_phone_number,
-                  @p_address_line1, @p_address_line2, @p_city, @p_state, @p_postal_code, @p_country, @p_locked_areas, @p_is_show_player, @p_created_at
+                  @p_address_line1, @p_address_line2, @p_city, @p_state, @p_postal_code, @p_country, @p_locked_areas, @p_is_show_player, @p_sport_id, @p_created_at
               )",
             new NpgsqlParameter("p_scout_id", NpgsqlDbType.Varchar)
             { Value = scout.ScoutId },
@@ -76,6 +86,8 @@ public class ScoutRepository : IScoutRepository
             { Value = (object?)scout.LockedAreas ?? DBNull.Value },
             new NpgsqlParameter("p_is_show_player", NpgsqlDbType.Boolean)
             { Value = scout.IsShowPlayer },
+            new NpgsqlParameter("p_sport_id", NpgsqlDbType.Integer)
+            { Value = (object?)scout.SportId ?? DBNull.Value },
             new NpgsqlParameter("p_created_at", NpgsqlDbType.Timestamp)
             { Value = DateTime.SpecifyKind(scout.CreatedAt, DateTimeKind.Unspecified) }
         );
@@ -100,7 +112,8 @@ public class ScoutRepository : IScoutRepository
                   postal_code = @p_postal_code,
                   country = @p_country,
                   locked_areas = @p_locked_areas,
-                  is_show_player = @p_is_show_player
+                  is_show_player = @p_is_show_player,
+                  sport_id = @p_sport_id
               WHERE scout_id = @p_scout_id",
             new NpgsqlParameter("p_scout_id", NpgsqlDbType.Varchar)
             { Value = scout.ScoutId },
@@ -131,7 +144,9 @@ public class ScoutRepository : IScoutRepository
             new NpgsqlParameter("p_locked_areas", NpgsqlDbType.Text)
             { Value = (object?)scout.LockedAreas ?? DBNull.Value },
             new NpgsqlParameter("p_is_show_player", NpgsqlDbType.Boolean)
-            { Value = scout.IsShowPlayer }
+            { Value = scout.IsShowPlayer },
+            new NpgsqlParameter("p_sport_id", NpgsqlDbType.Integer)
+            { Value = (object?)scout.SportId ?? DBNull.Value }
         );
 
         return await GetByIdAsync(scout.ScoutId);
@@ -195,6 +210,7 @@ public class ScoutRepository : IScoutRepository
             Country = reader["country"] as string,
             LockedAreas = reader["locked_areas"] as string,
             IsShowPlayer = reader["is_show_player"] != DBNull.Value && (bool)reader["is_show_player"],
+            SportId = reader["sport_id"] == DBNull.Value ? null : Convert.ToInt32(reader["sport_id"]),
             CreatedAt = (DateTime)reader["created_at"]
         };
     }

@@ -2781,7 +2781,7 @@ ALTER FUNCTION stf.sp_players_exists(p_id character varying) OWNER TO postgres;
 -- Name: sp_players_get_all(); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.sp_players_get_all() RETURNS TABLE(player_id character varying, full_name character varying, date_of_birth date, nationality character varying, position_code character varying, preferred_foot character varying, height_cm integer, weight_kg integer, current_club_id character varying, contract_start_date date, contract_end_date date, agent_name character varying, agent_scout_id character varying, contact_info character varying, profile_image_url character varying, player_email character varying, created_at timestamp without time zone, updated_at timestamp without time zone)
+CREATE FUNCTION stf.sp_players_get_all() RETURNS TABLE(player_id character varying, full_name character varying, date_of_birth date, nationality character varying, position_code character varying, preferred_foot character varying, height_cm integer, weight_kg integer, current_club_id character varying, contract_start_date date, contract_end_date date, agent_name character varying, agent_scout_id character varying, contact_info character varying, profile_image_url character varying, player_email character varying, sport_id integer, created_at timestamp without time zone, updated_at timestamp without time zone)
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -2804,6 +2804,7 @@ SELECT
     p.contact_info,
     p.profile_image_url,
     p.player_email,
+    p.sport_id,
     p.created_at,
     p.updated_at
 FROM stf.players p;
@@ -2819,7 +2820,7 @@ ALTER FUNCTION stf.sp_players_get_all() OWNER TO postgres;
 -- Name: sp_players_get_by_id(bigint); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.sp_players_get_by_id(p_id bigint) RETURNS TABLE(player_id character varying, full_name character varying, date_of_birth date, nationality character varying, position_code character varying, preferred_foot character varying, height_cm integer, weight_kg integer, current_club_id character varying, contract_start_date date, contract_end_date date, agent_name character varying, agent_scout_id character varying, contact_info character varying, profile_image_url character varying, player_email character varying, created_at timestamp without time zone, updated_at timestamp without time zone)
+CREATE FUNCTION stf.sp_players_get_by_id(p_id bigint) RETURNS TABLE(player_id character varying, full_name character varying, date_of_birth date, nationality character varying, position_code character varying, preferred_foot character varying, height_cm integer, weight_kg integer, current_club_id character varying, contract_start_date date, contract_end_date date, agent_name character varying, agent_scout_id character varying, contact_info character varying, profile_image_url character varying, player_email character varying, sport_id integer, created_at timestamp without time zone, updated_at timestamp without time zone)
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -2842,6 +2843,7 @@ SELECT
     p.contact_info,
     p.profile_image_url,
     p.player_email,
+    p.sport_id,
     p.created_at,
     p.updated_at
 FROM stf.players p
@@ -2858,7 +2860,7 @@ ALTER FUNCTION stf.sp_players_get_by_id(p_id bigint) OWNER TO postgres;
 -- Name: sp_players_insert(text, text, date, text, text, text, integer, integer, text, date, date, text, text, text, text, timestamp with time zone, timestamp with time zone, text); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.sp_players_insert(p_player_id text, p_full_name text, p_date_of_birth date, p_nationality text, p_position_code text, p_preferred_foot text, p_height_cm integer, p_weight_kg integer, p_current_club_id text, p_contract_start_date date, p_contract_end_date date, p_agent_name text, p_agent_scout_id text, p_contact_info text, p_profile_image_url text, p_created_at timestamp with time zone, p_updated_at timestamp with time zone, p_player_email text) RETURNS void
+CREATE FUNCTION stf.sp_players_insert(p_player_id text, p_full_name text, p_date_of_birth date, p_nationality text, p_position_code text, p_preferred_foot text, p_height_cm integer, p_weight_kg integer, p_current_club_id text, p_contract_start_date date, p_contract_end_date date, p_agent_name text, p_agent_scout_id text, p_contact_info text, p_profile_image_url text, p_sport_id integer, p_created_at timestamp with time zone, p_updated_at timestamp with time zone, p_player_email text) RETURNS void
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -2879,9 +2881,10 @@ INSERT INTO stf.players(
     agent_scout_id,
     contact_info,
     profile_image_url,
+    sport_id,
     created_at,
     updated_at,
-    player_email,
+    player_email
 )
 VALUES (
     p_player_id,
@@ -2898,24 +2901,25 @@ VALUES (
     p_agent_name,
     p_agent_scout_id,
     p_contact_info,
-    p_profile_image_url, 
+    p_profile_image_url,
+    p_sport_id,
     p_created_at,
     p_updated_at,
-    p_player_email,
+    p_player_email
 );
 
 END;
 $$;
 
 
-ALTER FUNCTION stf.sp_players_insert(p_player_id text, p_full_name text, p_date_of_birth date, p_nationality text, p_position_code text, p_preferred_foot text, p_height_cm integer, p_weight_kg integer, p_current_club_id text, p_contract_start_date date, p_contract_end_date date, p_agent_name text, p_agent_scout_id text, p_contact_info text, p_profile_image_url text, p_created_at timestamp with time zone, p_updated_at timestamp with time zone, p_player_email text) OWNER TO postgres;
+ALTER FUNCTION stf.sp_players_insert(p_player_id text, p_full_name text, p_date_of_birth date, p_nationality text, p_position_code text, p_preferred_foot text, p_height_cm integer, p_weight_kg integer, p_current_club_id text, p_contract_start_date date, p_contract_end_date date, p_agent_name text, p_agent_scout_id text, p_contact_info text, p_profile_image_url text, p_sport_id integer, p_created_at timestamp with time zone, p_updated_at timestamp with time zone, p_player_email text) OWNER TO postgres;
 
 --
 -- TOC entry 292 (class 1255 OID 18876)
 -- Name: sp_players_update(text, text, date, text, text, text, integer, integer, text, date, date, text, text, text, text, timestamp with time zone); Type: FUNCTION; Schema: stf; Owner: postgres
 --
 
-CREATE FUNCTION stf.sp_players_update(p_player_id text, p_full_name text, p_date_of_birth date, p_nationality text, p_position_code text, p_preferred_foot text, p_height_cm integer, p_weight_kg integer, p_current_club_id text, p_contract_start_date date, p_contract_end_date date, p_agent_name text, p_agent_scout_id text, p_contact_info text, p_profile_image_url text, p_updated_at timestamp with time zone) RETURNS void
+CREATE FUNCTION stf.sp_players_update(p_player_id text, p_full_name text, p_date_of_birth date, p_nationality text, p_position_code text, p_preferred_foot text, p_height_cm integer, p_weight_kg integer, p_current_club_id text, p_contract_start_date date, p_contract_end_date date, p_agent_name text, p_agent_scout_id text, p_contact_info text, p_profile_image_url text, p_sport_id integer, p_updated_at timestamp with time zone) RETURNS void
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -2936,6 +2940,7 @@ SET
     agent_scout_id = p_agent_scout_id,
     contact_info = p_contact_info,
     profile_image_url = p_profile_image_url,
+    sport_id = p_sport_id,
     updated_at = p_updated_at
 WHERE player_id = p_player_id;
 
@@ -2943,7 +2948,7 @@ END;
 $$;
 
 
-ALTER FUNCTION stf.sp_players_update(p_player_id text, p_full_name text, p_date_of_birth date, p_nationality text, p_position_code text, p_preferred_foot text, p_height_cm integer, p_weight_kg integer, p_current_club_id text, p_contract_start_date date, p_contract_end_date date, p_agent_name text, p_agent_scout_id text, p_contact_info text, p_profile_image_url text, p_updated_at timestamp with time zone) OWNER TO postgres;
+ALTER FUNCTION stf.sp_players_update(p_player_id text, p_full_name text, p_date_of_birth date, p_nationality text, p_position_code text, p_preferred_foot text, p_height_cm integer, p_weight_kg integer, p_current_club_id text, p_contract_start_date date, p_contract_end_date date, p_agent_name text, p_agent_scout_id text, p_contact_info text, p_profile_image_url text, p_sport_id integer, p_updated_at timestamp with time zone) OWNER TO postgres;
 
 --
 -- TOC entry 338 (class 1255 OID 18820)

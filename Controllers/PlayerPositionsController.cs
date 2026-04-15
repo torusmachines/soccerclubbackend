@@ -35,6 +35,13 @@ public class PlayerPositionsController : ControllerBase
         return Ok(item);
     }
 
+    [HttpGet("BySport/{sportId}")]
+    public async Task<ActionResult<IEnumerable<PlayerPosition>>> GetBySportId(int sportId)
+    {
+        var positions = await _service.GetBySportIdAsync(sportId);
+        return Ok(positions);
+    }
+
     [HttpPost]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<PlayerPosition>> Create(CreatePlayerPosition dto)

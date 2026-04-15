@@ -15,7 +15,7 @@ public class PlayerRepository : IPlayerRepository
     public async Task<IEnumerable<Player1>> GetAllAsync()
     {
         return await _db.ExecuteQueryListAsync(
-            "SELECT * FROM stf.sp_players_get_all()",
+            "SELECT * FROM stf.players",
             MapReaderToPlayer
         );
     }
@@ -23,7 +23,7 @@ public class PlayerRepository : IPlayerRepository
     public async Task<Player1?> GetByIdAsync(long id)
     {
         return await _db.ExecuteQuerySingleAsync(
-            "SELECT * FROM stf.sp_players_get_by_id(@p_id)",
+            "SELECT * FROM stf.players p WHERE CAST(p.player_id AS BIGINT) = @p_id",
             MapReaderToPlayer,
             new NpgsqlParameter("p_id", id)
         );
@@ -43,7 +43,7 @@ public class PlayerRepository : IPlayerRepository
         player.UpdatedAt = DateTime.UtcNow;
 
         await _db.ExecuteNonQueryAsync(
-            "SELECT * FROM stf.sp_players_insert(@player_id, @full_name, @date_of_birth, @nationality, @position_code, @preferred_foot, @height_cm, @weight_kg, @current_club_id, @contract_start_date, @contract_end_date, @agent_name, @agent_scout_id, @contact_info, @profile_image_url, @created_at, @updated_at, @player_email)",
+            "SELECT * FROM stf.sp_players_insert(@player_id, @full_name, @date_of_birth, @nationality, @position_code, @preferred_foot, @height_cm, @weight_kg, @current_club_id, @contract_start_date, @contract_end_date, @agent_name, @agent_scout_id, @contact_info, @profile_image_url, @sport_id, @contract_start_with_coach, @contract_end_with_coach, @created_at, @updated_at, @player_email)",
             BuildPlayerParameters(player,"new").ToArray()
         );
 
@@ -52,11 +52,7 @@ public class PlayerRepository : IPlayerRepository
 
     public async Task<Player1?> GetByCustomIdAsync(long id)
     {
-        return await _db.ExecuteQuerySingleAsync(
-            "SELECT * FROM stf.sp_players_get_by_id(@p_id)",
-            MapReaderToPlayer,
-            new NpgsqlParameter("p_id", id)
-        );
+        return await GetByIdAsync(id);
     }
 
     /* public async Task<Player1?> UpdateAsync(Player1 player)
@@ -95,7 +91,7 @@ public class PlayerRepository : IPlayerRepository
 
         // Perform update
         await _db.ExecuteNonQueryAsync(
-            "SELECT stf.sp_players_update(@player_id, @full_name, @date_of_birth, @nationality, @position_code, @preferred_foot, @height_cm, @weight_kg, @current_club_id, @contract_start_date, @contract_end_date, @agent_name, @agent_scout_id, @contact_info, @profile_image_url, @updated_at)",
+            "SELECT stf.sp_players_update(@player_id, @full_name, @date_of_birth, @nationality, @position_code, @preferred_foot, @height_cm, @weight_kg, @current_club_id, @contract_start_date, @contract_end_date, @agent_name, @agent_scout_id, @contact_info, @profile_image_url, @sport_id, @contract_start_with_coach, @contract_end_with_coach, @updated_at)",
             BuildPlayerParameters(player,"edit").ToArray()
         );
 
@@ -144,13 +140,18 @@ public class PlayerRepository : IPlayerRepository
         new("agent_scout_id", player.AgentScoutId ?? (object)DBNull.Value),
         new("contact_info", player.ContactInfo ?? (object)DBNull.Value),
         new("profile_image_url", player.ProfileImageUrl ?? (object)DBNull.Value),
-        new("created_at", player.CreatedAt),
+        new("sport_id", player.SportId ?? (object)DBNull.Value),
+        new("contract_start_with_coach", player.ContractStartWithCoach == null ? DBNull.Value : (object)player.ContractStartWithCoach),
+        new("contract_end_with_coach", player.ContractEndWithCoach == null ? DBNull.Value : (object)player.ContractEndWithCoach),
         new("updated_at", player.UpdatedAt)
     };
 
-        // ✅ Add only for edit
+        // ✅ Add only for new records
         if (type == "new")
         {
+            // Keep the order aligned with the INSERT function signature:
+            // ... profile_image_url, sport_id, created_at, updated_at, player_email
+            parameters.Insert(16, new NpgsqlParameter("created_at", player.CreatedAt));
             parameters.Add(new NpgsqlParameter("player_email", player.playerEmail ?? (object)DBNull.Value));
         }
 
@@ -175,7 +176,13 @@ public class PlayerRepository : IPlayerRepository
             ? null
             : DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("contract_end_date")));
 
+        DateOnly? contractStartWithCoach = HasColumn(reader, "contract_start_with_coach") && reader["contract_start_with_coach"] != DBNull.Value
+            ? DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("contract_start_with_coach")))
+            : null;
 
+        DateOnly? contractEndWithCoach = HasColumn(reader, "contract_end_with_coach") && reader["contract_end_with_coach"] != DBNull.Value
+            ? DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("contract_end_with_coach")))
+            : null;
 
         var heightCm = reader["height_cm"] == DBNull.Value ? 0 : Convert.ToInt32(reader["height_cm"]);
         var weightKg = reader["weight_kg"] == DBNull.Value ? 0 : Convert.ToInt32(reader["weight_kg"]);
@@ -197,6 +204,9 @@ public class PlayerRepository : IPlayerRepository
             AgentScoutId = reader["agent_scout_id"] == DBNull.Value ? null : reader["agent_scout_id"].ToString(),
             ContactInfo = reader["contact_info"] == DBNull.Value ? null : reader["contact_info"].ToString(),
             ProfileImageUrl = reader["profile_image_url"] == DBNull.Value ? null : reader["profile_image_url"].ToString(),
+            SportId = HasColumn(reader, "sport_id") && reader["sport_id"] != DBNull.Value ? (int?)Convert.ToInt32(reader["sport_id"]) : null,
+            ContractStartWithCoach = contractStartWithCoach,
+            ContractEndWithCoach = contractEndWithCoach,
             playerEmail = HasColumn(reader, "player_email") && reader["player_email"] != DBNull.Value
                 ? reader["player_email"].ToString()!
                 : string.Empty,

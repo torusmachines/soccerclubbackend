@@ -50,6 +50,9 @@ public class PlayerService : IPlayerService
             ContactInfo = createPlayerDto.ContactInfo ?? string.Empty,
             ProfileImageUrl = createPlayerDto.ProfileImage ?? null,
             playerEmail = createPlayerDto.PlayerEmail ?? string.Empty,
+            SportId = createPlayerDto.SportId,
+            ContractStartWithCoach = createPlayerDto.ContractStartWithCoach,
+            ContractEndWithCoach = createPlayerDto.ContractEndWithCoach,
 
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -86,6 +89,9 @@ public class PlayerService : IPlayerService
             AgentScoutId = updatePlayerDto.AgentScoutId ?? existingPlayer.AgentScoutId,
             ContactInfo = updatePlayerDto.ContactInfo ?? existingPlayer.ContactInfo,
             ProfileImageUrl = updatePlayerDto.ProfileImage ?? existingPlayer.ProfileImageUrl,
+            SportId = updatePlayerDto.SportId ?? existingPlayer.SportId,
+            ContractStartWithCoach = updatePlayerDto.ContractStartWithCoach ?? existingPlayer.ContractStartWithCoach,
+            ContractEndWithCoach = updatePlayerDto.ContractEndWithCoach ?? existingPlayer.ContractEndWithCoach,
         };
 
         var updatedPlayer = await _playerRepository.UpdateAsync(player);
@@ -125,6 +131,10 @@ public class PlayerService : IPlayerService
             agent_scout_id = player.AgentScoutId,
             profileImage = player.ProfileImageUrl,
             PlayerEmail = player.playerEmail,
+            SportId = player.SportId,
+            SportName = player.Sport?.SportName,
+            ContractStartWithCoach = player.ContractStartWithCoach,
+            ContractEndWithCoach = player.ContractEndWithCoach,
         };
     }
 

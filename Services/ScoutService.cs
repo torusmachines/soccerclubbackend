@@ -28,6 +28,12 @@ public class ScoutService : IScoutService
         return scout == null ? null : MapToDto(scout);
     }
 
+    public async Task<IEnumerable<Scout>> GetScoutsBySportIdAsync(int sportId)
+    {
+        var scouts = await _scoutRepository.GetBySportIdAsync(sportId);
+        return scouts.Select(MapToDto);
+    }
+
     public async Task<Scout> CreateScoutAsync(CreateScout createScoutDto)
     {
         if (await _scoutRepository.ScoutNameExistsAsync(createScoutDto.ScoutName))
@@ -60,6 +66,7 @@ public class ScoutService : IScoutService
             Country = createScoutDto.Country,
             LockedAreas = createScoutDto.LockedAreas,
             IsShowPlayer = createScoutDto.IsShowPlayer ?? false,
+            SportId = createScoutDto.SportId,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -95,6 +102,7 @@ public class ScoutService : IScoutService
             Country = updateScoutDto.Country,
             LockedAreas = updateScoutDto.LockedAreas,
             IsShowPlayer = updateScoutDto.IsShowPlayer ?? existingScout.IsShowPlayer,
+            SportId = updateScoutDto.SportId,
             CreatedAt = existingScout.CreatedAt
         };
 
@@ -130,6 +138,7 @@ public class ScoutService : IScoutService
             Country = scout.Country,
             LockedAreas = scout.LockedAreas,
             IsShowPlayer = scout.IsShowPlayer,
+            SportId = scout.SportId,
             CreatedAt = scout.CreatedAt
         };
     }

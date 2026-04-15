@@ -32,6 +32,11 @@ public class Player
 
     [JsonPropertyName("player_email")]
     public string? PlayerEmail { get; set; }
+
+    public int? SportId { get; set; }
+    public string? SportName { get; set; }
+    public DateOnly? ContractStartWithCoach { get; set; }
+    public DateOnly? ContractEndWithCoach { get; set; }
 }
 
 public class CreatePlayer
@@ -61,6 +66,10 @@ public class CreatePlayer
 
     [JsonPropertyName("player_email")]
     public string? PlayerEmail { get; set; }
+
+    public int? SportId { get; set; }
+    public DateOnly? ContractStartWithCoach { get; set; }
+    public DateOnly? ContractEndWithCoach { get; set; }
 }
 
 public class UpdatePlayer
@@ -87,5 +96,9 @@ public class UpdatePlayer
 
     [JsonPropertyName("profileImage")]  
     public string? ProfileImage { get; set; }
+
+    public int? SportId { get; set; }
+    public DateOnly? ContractStartWithCoach { get; set; }
+    public DateOnly? ContractEndWithCoach { get; set; }
 }
 

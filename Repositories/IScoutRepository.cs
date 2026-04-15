@@ -6,6 +6,7 @@ public interface IScoutRepository
 {
     Task<IEnumerable<Scout>> GetAllAsync();
     Task<Scout?> GetByIdAsync(string id);
+    Task<IEnumerable<Scout>> GetBySportIdAsync(int sportId);
     Task<Scout> CreateAsync(Scout scout);
     Task<string?> GetMaxScoutIdAsync();
     Task<Scout?> UpdateAsync(Scout scout);

@@ -25,7 +25,7 @@ builder.Services.AddControllers()
 // {
 //     options.SuppressModelStateInvalidFilter = true; // ADD THIS
 // });
-// Note: Removed SuppressModelStateInvalidFilter to allow proper error reporting
+    // Note: Removed SuppressModelStateInvalidFilter to allow proper error reporting
 
 //// Database Connection
 //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -53,6 +53,10 @@ if (string.IsNullOrEmpty(postgresConnectionString))
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(postgresConnectionString));
 
+// ── Football DbContext (stf schema in PostgreSQL) ───────────────────────────
+builder.Services.AddDbContext<FootballContext>(options =>
+    options.UseNpgsql(postgresConnectionString));
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -75,6 +79,7 @@ builder.Services.AddScoped<PostgresConnectionProvider>(
 builder.Services.AddScoped<IEmailRepository, EmailRepository>();
 builder.Services.AddScoped<IReviewSkillDetailRepository, ReviewSkillDetailRepository>();
 builder.Services.AddScoped<IReviewRatingRepository, ReviewRatingRepository>();
+builder.Services.AddScoped<IReviewActivityRatingRepository, ReviewActivityRatingRepository>();
 builder.Services.AddScoped<IClubRepository, ClubRepository>();
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
 builder.Services.AddScoped<IScoutRepository, ScoutRepository>();
@@ -97,6 +102,18 @@ builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<ITaskCommentService, TaskCommentService>();
+builder.Services.AddScoped<IAiPlanService, AiPlanService>();
+
+// Register AI Service (choose OpenAI or Groq based on configuration)
+if (builder.Configuration["AI:Provider"] == "Groq")
+{
+    builder.Services.AddHttpClient<IAiService, GroqAiService>();
+}
+else
+{
+    builder.Services.AddHttpClient<IAiService, OpenAiService>();
+}
 
 // CORS for React App
 //builder.Services.AddCors(options =>

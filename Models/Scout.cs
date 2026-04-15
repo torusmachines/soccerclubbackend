@@ -70,6 +70,9 @@ public partial class Scout
     [Column("is_show_player")]
     public bool IsShowPlayer { get; set; }
 
+    [Column("sport_id")]
+    public int? SportId { get; set; }
+
     [Column("created_at")]
     [Precision(0)]
     public DateTime CreatedAt { get; set; }
@@ -107,6 +110,7 @@ public class CreateScout
     public string? Country { get; set; }
     public string? LockedAreas { get; set; }
     public bool? IsShowPlayer { get; set; }
+    public int? SportId { get; set; }
 }
 
 public class UpdateScout
@@ -125,4 +129,5 @@ public class UpdateScout
     public string? Country { get; set; }
     public string? LockedAreas { get; set; }
     public bool? IsShowPlayer { get; set; }
+    public int? SportId { get; set; }
 }
