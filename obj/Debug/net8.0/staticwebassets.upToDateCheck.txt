@@ -5,6 +5,11 @@ wwwroot\club-logos\club-5.jpg
 wwwroot\club-logos\club-6.jfif
 wwwroot\club-logos\club-7.png
 wwwroot\club-logos\club-8.png
+wwwroot\documents\6bb4d15a-4f2b-4b35-8ce8-7f68e5dcb1cd_8e7db7e9-8b58-4a33-8bae-70f540e615e3_Pasted text.txt
+wwwroot\documents\6bb4d15a-4f2b-4b35-8ce8-7f68e5dcb1cd_images.webp
+wwwroot\documents\6bb4d15a-4f2b-4b35-8ce8-7f68e5dcb1cd_Jordan Agency_Logo.jpg
+wwwroot\documents\6bb4d15a-4f2b-4b35-8ce8-7f68e5dcb1cd_Meeting in Vru Projects.docx
+wwwroot\documents\6bb4d15a-4f2b-4b35-8ce8-7f68e5dcb1cd_TorusLogo.png
 wwwroot\player-images\player-1.jpg
 wwwroot\player-images\player-10.png
 wwwroot\player-images\player-12.png
@@ -21,3 +26,4 @@ wwwroot\uploads\company-logo.jfif
 wwwroot\uploads\company-logo.jpeg
 wwwroot\uploads\company-logo.jpg
 wwwroot\uploads\company-logo.png
+wwwroot\player-images\player-13.webp

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "OMyZeblhNhs=",
+  "dgSpecHash": "T6HJ48Ys+ok=",
   "success": true,
-  "projectFilePath": "C:\\JIGNESH MARU\\OneDrive - RameshVaghela\\Desktop\\Projects\\VRU\\Football_Hosting\\FootballDashboardAPI\\FootballDashboardAPI.csproj",
+  "projectFilePath": "C:\\JIGNESH MARU\\OneDrive - RameshVaghela\\Desktop\\Projects\\VRU\\SoccerClub\\FootballDashboardAPI\\FootballDashboardAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\HP\\.nuget\\packages\\azure.core\\1.44.1\\azure.core.1.44.1.nupkg.sha512",
     "C:\\Users\\HP\\.nuget\\packages\\azure.identity\\1.13.2\\azure.identity.1.13.2.nupkg.sha512",

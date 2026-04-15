@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\JIGNESH MARU\\OneDrive - RameshVaghela\\Desktop\\Projects\\VRU\\Football_Hosting\\FootballDashboardAPI\\FootballDashboardAPI.csproj": {}
+    "C:\\JIGNESH MARU\\OneDrive - RameshVaghela\\Desktop\\Projects\\VRU\\SoccerClub\\FootballDashboardAPI\\FootballDashboardAPI.csproj": {}
   },
   "projects": {
-    "C:\\JIGNESH MARU\\OneDrive - RameshVaghela\\Desktop\\Projects\\VRU\\Football_Hosting\\FootballDashboardAPI\\FootballDashboardAPI.csproj": {
+    "C:\\JIGNESH MARU\\OneDrive - RameshVaghela\\Desktop\\Projects\\VRU\\SoccerClub\\FootballDashboardAPI\\FootballDashboardAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\JIGNESH MARU\\OneDrive - RameshVaghela\\Desktop\\Projects\\VRU\\Football_Hosting\\FootballDashboardAPI\\FootballDashboardAPI.csproj",
+        "projectUniqueName": "C:\\JIGNESH MARU\\OneDrive - RameshVaghela\\Desktop\\Projects\\VRU\\SoccerClub\\FootballDashboardAPI\\FootballDashboardAPI.csproj",
         "projectName": "FootballDashboardAPI",
-        "projectPath": "C:\\JIGNESH MARU\\OneDrive - RameshVaghela\\Desktop\\Projects\\VRU\\Football_Hosting\\FootballDashboardAPI\\FootballDashboardAPI.csproj",
+        "projectPath": "C:\\JIGNESH MARU\\OneDrive - RameshVaghela\\Desktop\\Projects\\VRU\\SoccerClub\\FootballDashboardAPI\\FootballDashboardAPI.csproj",
         "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
-        "outputPath": "C:\\JIGNESH MARU\\OneDrive - RameshVaghela\\Desktop\\Projects\\VRU\\Football_Hosting\\FootballDashboardAPI\\obj\\",
+        "outputPath": "C:\\JIGNESH MARU\\OneDrive - RameshVaghela\\Desktop\\Projects\\VRU\\SoccerClub\\FootballDashboardAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

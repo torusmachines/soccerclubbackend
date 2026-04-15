@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FootballDashboardAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5f2d674ed58b503ee8d1775174062151570fb964")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3366dc873754d22a0887d7bc2e3e25fd8219dbc4")]
 [assembly: System.Reflection.AssemblyProductAttribute("FootballDashboardAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FootballDashboardAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
