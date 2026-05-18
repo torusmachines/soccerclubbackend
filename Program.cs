@@ -1,7 +1,9 @@
 using FootballDashboardAPI.Data;
 using FootballDashboardAPI.Models;
 using FootballDashboardAPI.Repositories;
+using FootballDashboardAPI.Repositories.Interfaces;
 using FootballDashboardAPI.Services;
+using FootballDashboardAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,10 +23,6 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
-//.ConfigureApiBehaviorOptions(options =>
-// {
-//     options.SuppressModelStateInvalidFilter = true; // ADD THIS
-// });
     // Note: Removed SuppressModelStateInvalidFilter to allow proper error reporting
 
 //// Database Connection
@@ -61,8 +59,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
     options.Password.RequiredLength = 8;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.User.RequireUniqueEmail = true;
@@ -88,6 +87,7 @@ builder.Services.AddScoped<ITemplateRepository, TemplateRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<ICompanyProfileRepository, CompanyProfileRepository>();
+builder.Services.AddScoped<IContractRepository, ContractRepository>();
 
 // Register Services
 builder.Services.AddScoped<IClubService, ClubService>();
@@ -101,6 +101,7 @@ builder.Services.AddScoped<ITemplateService, TemplateService>();
 builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ITaskCommentService, TaskCommentService>();
 builder.Services.AddScoped<IAiPlanService, AiPlanService>();
@@ -116,19 +117,6 @@ else
 }
 
 // CORS for React App
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowReactApp", policy =>
-//    {
-//        policy.WithOrigins(
-//                "https://localhost:8080", "https://soccerclubbackend.onrender.com", "http://localhost:8080", "http://soccerclubbackend.onrender.com", "localhost:8080", "https://soccerclubfrontend.onrender.com", "http://soccerclubfrontend.onrender.com")
-//              .AllowAnyHeader()
-//              .AllowAnyMethod()
-//              .AllowCredentials()
-//              //.AllowCredentials()
-//              .WithExposedHeaders("Authorization");
-//    });
-//});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
@@ -170,6 +158,7 @@ builder.Services.AddSwaggerGen();
 
 // Email notification services
 builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>();
+builder.Services.AddScoped<IConsentService, ConsentService>();
 //builder.Services.AddHostedService<NotificationBackgroundService>();
 
 var app = builder.Build();
@@ -208,17 +197,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
 
 app.UseAuthentication();
+app.UseMiddleware<ConsentEnforcementMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseDefaultFiles();
+
 app.UseStaticFiles();
-app.MapFallbackToFile("index.html");
 
 
 
