@@ -7,36 +7,88 @@ using System.Text.Json.Serialization;
 
 namespace FootballDashboardAPI.Models;
 
-[Table("players")]
+[Table("players", Schema = "public")]
 public class Player
 {
+    [Column("id")]
     public long Id { get; set; }
+
+    [Column("full_name")]
     public string FullName { get; set; } = null!;
+
+    [Column("date_of_birth")]
     public DateOnly? DateOfBirth { get; set; }
+
+    [Column("nationality")]
     public string? Nationality { get; set; }
+
+    [Column("player_position")]
     public string? Position { get; set; }
+
+    [Column("preferred_foot")]
     public string? PreferredFoot { get; set; }
+
+    [Column("height_cm")]
     public int? HeightCm { get; set; }
+
+    [Column("weight_kg")]
     public int? WeightKg { get; set; }
+
+    [Column("current_club")]
     public string? CurrentClub { get; set; }
+
+    [Column("contract_start")]
     public DateOnly? ContractStart { get; set; }
+
+    [Column("contract_end")]
     public DateOnly? ContractEnd { get; set; }
+
+    [Column("contract_status")]
     public string? ContractStatus { get; set; }
+
+    [Column("agent_name")]
     public string? AgentName { get; set; }
+
+    [Column("agent_contact")]
     public string? contact_info { get; set; }
+
+    [Column("created_at")]
     public DateTime? CreatedAt { get; set; }
+
+    [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
+
+    [NotMapped]
     public string? agent_scout_id { get; set; }
 
+    [NotMapped]
     public string? profileImage { get; set; }
 
     [JsonPropertyName("player_email")]
+    [NotMapped]
     public string? PlayerEmail { get; set; }
 
+    [NotMapped]
     public int? SportId { get; set; }
+
+    [NotMapped]
     public string? SportName { get; set; }
+
+    [NotMapped]
     public DateOnly? ContractStartWithCoach { get; set; }
+
+    [NotMapped]
     public DateOnly? ContractEndWithCoach { get; set; }
+
+    [NotMapped]
+    public string? AddressLine1 { get; set; }
+
+    [NotMapped]
+    public string? AddressLine2 { get; set; }
+
+    /// <summary>Pending | Approved | Rejected</summary>
+    [NotMapped]
+    public string? UserStatus { get; set; }
 }
 
 public class CreatePlayer
@@ -70,6 +122,8 @@ public class CreatePlayer
     public int? SportId { get; set; }
     public DateOnly? ContractStartWithCoach { get; set; }
     public DateOnly? ContractEndWithCoach { get; set; }
+    public string? AddressLine1 { get; set; }
+    public string? AddressLine2 { get; set; }
 }
 
 public class UpdatePlayer
@@ -100,5 +154,8 @@ public class UpdatePlayer
     public int? SportId { get; set; }
     public DateOnly? ContractStartWithCoach { get; set; }
     public DateOnly? ContractEndWithCoach { get; set; }
+    public string? AddressLine1 { get; set; }
+    public string? AddressLine2 { get; set; }
 }
+
 

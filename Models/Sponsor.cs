@@ -39,5 +39,8 @@ namespace FootballDashboardAPI.Models
         // Navigation property
         [JsonIgnore]
         public ICollection<CommercialContract> Contracts { get; set; } = new List<CommercialContract>();
+
+        [JsonIgnore]
+        public ICollection<SponsorComment> Comments { get; set; } = new List<SponsorComment>();
     }
 }

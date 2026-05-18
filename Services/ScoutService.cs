@@ -41,17 +41,9 @@ public class ScoutService : IScoutService
             throw new InvalidOperationException($"Scout with name '{createScoutDto.ScoutName}' already exists.");
         }
 
-        // Get max ID from repository
-        var maxId = await _scoutRepository.GetMaxScoutIdAsync();
-        int nextNumber = 1;
-        if (maxId != null && int.TryParse(maxId, out var num))
-        {
-            nextNumber = num + 1;
-        }
-
         var scout = new Scout
         {
-            ScoutId = $"{nextNumber}",
+            ScoutId = Guid.NewGuid().ToString(),
             ScoutName = createScoutDto.ScoutName,
             RoleName = createScoutDto.RoleName,
             FirstName = createScoutDto.FirstName,

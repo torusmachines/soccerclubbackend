@@ -10,4 +10,5 @@ public interface ITaskService
     Task<Task> CreateTaskAsync(CreateTask dto);
     Task<Task?> UpdateTaskAsync(string id, UpdateTask dto);
     Task<bool> DeleteTaskAsync(string id);
+    System.Threading.Tasks.Task SendConsolidatedFollowupEmailAsync(string reviewId);
 }

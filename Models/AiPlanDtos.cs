@@ -14,26 +14,19 @@ public class AiPlanGenerateRequest
     [Required]
     public string SkillType { get; set; } = null!;
 
-    [Required]
-    [RegularExpression("Beginner|Intermediate|Advanced")]
-    public string CurrentLevel { get; set; } = null!;
-
-    [Required]
-    [RegularExpression("Beginner|Intermediate|Advanced")]
-    public string TargetLevel { get; set; } = null!;
-
-    [Range(1, 52)]
     public int DurationWeeks { get; set; }
 
     [Range(1, 7)]
     public int TrainingDaysPerWeek { get; set; }
 
-    [Range(15, 180)]
     public int SessionDurationMinutes { get; set; }
 
-    public bool HasInjury { get; set; }
+    [Range(1, 5)]
+    public int TopNRatings { get; set; } = 3;
 
-    public string? InjuryDetails { get; set; }
+    public double? CurrentRating { get; set; }
+
+    public double? TargetRating { get; set; }
 }
 
 public class AiPlanResponse
@@ -44,13 +37,12 @@ public class AiPlanResponse
     public int Version { get; set; }
     public DateTime CreatedAt { get; set; }
     public string? SkillType { get; set; }
-    public string? CurrentLevel { get; set; }
-    public string? TargetLevel { get; set; }
     public int? DurationWeeks { get; set; }
     public int? TrainingDaysPerWeek { get; set; }
     public int? SessionDurationMinutes { get; set; }
-    public bool? HasInjury { get; set; }
-    public string? InjuryDetails { get; set; }
+    public int? TopNRatings { get; set; }
+    public double? CurrentRating { get; set; }
+    public double? TargetRating { get; set; }
     public string? PdfPath { get; set; }
 }
 

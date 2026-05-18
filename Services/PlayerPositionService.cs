@@ -18,7 +18,8 @@ public class PlayerPositionService : IPlayerPositionService
     public async Task<IEnumerable<PlayerPosition>> GetAllAsync()
     {
         return await _db.ExecuteQueryListAsync(
-            "SELECT * FROM stf.fn_player_positions_get_all()",
+            // Select directly from table to ensure sport_id column is returned
+            "SELECT position_id, position_code, position_name, description, sport_id, created_at, created_by FROM stf.player_positions ORDER BY position_code",
             MapReaderToPlayerPosition
         );
     }
@@ -26,7 +27,7 @@ public class PlayerPositionService : IPlayerPositionService
     public async Task<PlayerPosition?> GetByIdAsync(string id)
     {
         return await _db.ExecuteQuerySingleAsync(
-            "SELECT * FROM stf.fn_player_positions_get_by_id(@p_id)",
+            "SELECT position_id, position_code, position_name, description, sport_id, created_at, created_by FROM stf.player_positions WHERE position_id = @p_id",
             MapReaderToPlayerPosition,
             new NpgsqlParameter("p_id", NpgsqlDbType.Varchar) { Value = id }
         );

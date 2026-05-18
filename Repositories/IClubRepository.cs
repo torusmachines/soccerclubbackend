@@ -6,6 +6,9 @@ public interface IClubRepository
 {
     Task<IEnumerable<Club>> GetAllAsync();
     Task<Club?> GetByIdAsync(string id);
+    Task<IEnumerable<FootballDashboardAPI.Models.ClubDto>> GetAllWithContactCountsAsync();
+    Task<FootballDashboardAPI.Models.ClubDto?> GetByIdWithContactCountAsync(string id);
+    Task<FootballDashboardAPI.Models.Responses.ClubDetailsResponse?> GetClubDetailsWithPlayersAsync(string id);
     Task<Club> CreateAsync(Club club);
     Task<Club?> UpdateAsync(Club club);
     Task<bool> DeleteAsync(string id);

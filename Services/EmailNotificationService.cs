@@ -1,6 +1,8 @@
 ﻿using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Collections.Concurrent;
+using System.Security.Cryptography;
 
 namespace FootballDashboardAPI.Services;
 
@@ -17,21 +19,64 @@ public class EmailNotificationService : IEmailNotificationService
         _logger = logger;
     }
 
+    // Simple in-memory recent-send tracker to avoid duplicate sends within a short window
+    private static readonly ConcurrentDictionary<string, DateTime> _recentSends = new();
+    private static readonly TimeSpan _dedupeWindow = TimeSpan.FromSeconds(5);
+
     // ── Core send method ─────────────────────────────────────────────
     public async Task SendEmailAsync(string toEmail, string toName, string subject, string htmlContent)
     {
         try
         {
             ValidatePowerAutomateConfiguration();
+            // Dedupe: skip if an identical email was sent very recently
+            var key = ComputeHash(toEmail + "|" + subject + "|" + htmlContent);
+            var now = DateTime.UtcNow;
+            if (_recentSends.TryGetValue(key, out var last) && now - last < _dedupeWindow)
+            {
+                _logger.LogInformation("Skipping duplicate email to {Email} - {Subject}", toEmail, subject);
+                return;
+            }
+
+            // Record this send time before attempting to send to reduce race windows
+            _recentSends[key] = now;
+
             await SendEmailViaPowerAutomateAsync(toEmail, subject, htmlContent);
+
+            // Cleanup old entries
+            foreach (var kv in _recentSends)
+            {
+                if (now - kv.Value > _dedupeWindow)
+                {
+                    _recentSends.TryRemove(kv.Key, out _);
+                }
+            }
 
             _logger.LogInformation("✅ Email sent to {Email} - {Subject}", toEmail, subject);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "❌ Failed to send email to {Email}", toEmail);
+            // On failure, remove the recent send marker so retries are allowed
+            try
+            {
+                var key = ComputeHash(toEmail + "|" + subject + "|" + htmlContent);
+                _recentSends.TryRemove(key, out _);
+            }
+            catch { }
             throw;
         }
+    }
+
+    private static string ComputeHash(string input)
+    {
+        using var sha = SHA256.Create();
+        var bytes = Encoding.UTF8.GetBytes(input ?? string.Empty);
+        var hash = sha.ComputeHash(bytes);
+        var sb = new StringBuilder(hash.Length * 2);
+        foreach (var b in hash)
+            sb.Append(b.ToString("x2"));
+        return sb.ToString();
     }
 
     private string PowerAutomateFlowUrl => _config["PowerAutomate:FlowUrl"] ?? string.Empty;

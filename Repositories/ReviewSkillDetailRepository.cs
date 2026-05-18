@@ -1,115 +1,82 @@
 ﻿using FootballDashboardAPI.Models;
-using Npgsql;
-using NpgsqlTypes;
+using Microsoft.EntityFrameworkCore;
 
 namespace FootballDashboardAPI.Repositories;
 
 public class ReviewSkillDetailRepository : IReviewSkillDetailRepository
 {
-    private readonly PostgresConnectionProvider _db;
+    private readonly FootballContext _footballContext;
 
-    public ReviewSkillDetailRepository(PostgresConnectionProvider db)
+    public ReviewSkillDetailRepository(FootballContext footballContext)
     {
-        _db = db;
+        _footballContext = footballContext;
     }
 
     public async Task<IEnumerable<ReviewSkillDetail>> GetAllAsync()
     {
-        return await _db.ExecuteQueryListAsync(
-            "SELECT * FROM stf.fn_review_skill_details_get_all()",
-            MapReaderToReviewSkillDetail
-        );
+        return await _footballContext.ReviewSkillDetails
+            .AsNoTracking()
+            .OrderBy(r => r.ReviewId)
+            .ThenBy(r => r.SkillKey)
+            .ToListAsync();
     }
 
     public async Task<ReviewSkillDetail?> GetByIdAsync(string reviewId, string skillKey)
     {
-        return await _db.ExecuteQuerySingleAsync(
-            "SELECT * FROM stf.fn_review_skill_details_get_by_id(@p_review_id, @p_skill_key)",
-            MapReaderToReviewSkillDetail,
-            new NpgsqlParameter("p_review_id", NpgsqlDbType.Varchar) { Value = reviewId },
-            new NpgsqlParameter("p_skill_key", NpgsqlDbType.Varchar) { Value = skillKey }
-        );
+        return await _footballContext.ReviewSkillDetails
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.ReviewId == reviewId && r.SkillKey == skillKey);
     }
 
     public async Task<IEnumerable<ReviewSkillDetail>> GetByReviewIdAsync(string reviewId)
     {
-        return await _db.ExecuteQueryListAsync(
-            "SELECT * FROM stf.fn_review_skill_details_get_by_review_id(@p_review_id)",
-            MapReaderToReviewSkillDetail,
-            new NpgsqlParameter("p_review_id", NpgsqlDbType.Varchar) { Value = reviewId }
-        );
+        return await _footballContext.ReviewSkillDetails
+            .AsNoTracking()
+            .Where(r => r.ReviewId == reviewId)
+            .OrderBy(r => r.SkillKey)
+            .ToListAsync();
     }
 
     public async Task<bool> ExistsAsync(string reviewId, string skillKey)
     {
-        var result = await _db.ExecuteScalarAsync(
-            "SELECT stf.fn_review_skill_details_exists(@p_review_id, @p_skill_key)",
-            new NpgsqlParameter("p_review_id", NpgsqlDbType.Varchar) { Value = reviewId },
-            new NpgsqlParameter("p_skill_key", NpgsqlDbType.Varchar) { Value = skillKey }
-        );
-        return Convert.ToInt32(result ?? 0) > 0;
+        return await _footballContext.ReviewSkillDetails
+            .AsNoTracking()
+            .AnyAsync(r => r.ReviewId == reviewId && r.SkillKey == skillKey);
     }
 
     public async Task<ReviewSkillDetail> CreateAsync(ReviewSkillDetail detail)
     {
-        await _db.ExecuteNonQueryAsync(
-            "SELECT stf.fn_review_skill_details_insert(@p_review_id, @p_skill_key, @p_rating, @p_comment_text, @p_follow_up_date)",
-            new NpgsqlParameter("p_review_id", NpgsqlDbType.Varchar)
-            { Value = detail.ReviewId },
-            new NpgsqlParameter("p_skill_key", NpgsqlDbType.Varchar)
-            { Value = detail.SkillKey },
-            new NpgsqlParameter("p_rating", NpgsqlDbType.Numeric)
-            { Value = detail.Rating },
-            new NpgsqlParameter("p_comment_text", NpgsqlDbType.Text)
-            { Value = detail.CommentText == null ? DBNull.Value : (object)detail.CommentText },
-            new NpgsqlParameter("p_follow_up_date", NpgsqlDbType.Date)
-            { Value = detail.FollowUpDate == null ? DBNull.Value : (object)detail.FollowUpDate }
-        );
+        _footballContext.ReviewSkillDetails.Add(detail);
+        await _footballContext.SaveChangesAsync();
 
-        return await GetByIdAsync(detail.ReviewId, detail.SkillKey) ?? detail;
+        return detail;
     }
 
     public async Task<ReviewSkillDetail?> UpdateAsync(ReviewSkillDetail detail)
     {
-        var existing = await GetByIdAsync(detail.ReviewId, detail.SkillKey);
+        var existing = await _footballContext.ReviewSkillDetails
+            .FirstOrDefaultAsync(r => r.ReviewId == detail.ReviewId && r.SkillKey == detail.SkillKey);
+
         if (existing == null) return null;
 
-        await _db.ExecuteNonQueryAsync(
-            "SELECT stf.fn_review_skill_details_update(@p_review_id, @p_skill_key, @p_rating, @p_comment_text, @p_follow_up_date)",
-            new NpgsqlParameter("p_review_id", NpgsqlDbType.Varchar)
-            { Value = detail.ReviewId },
-            new NpgsqlParameter("p_skill_key", NpgsqlDbType.Varchar)
-            { Value = detail.SkillKey },
-            new NpgsqlParameter("p_rating", NpgsqlDbType.Numeric)
-            { Value = detail.Rating },
-            new NpgsqlParameter("p_comment_text", NpgsqlDbType.Text)
-            { Value = detail.CommentText == null ? DBNull.Value : (object)detail.CommentText },
-            new NpgsqlParameter("p_follow_up_date", NpgsqlDbType.Date)
-            { Value = detail.FollowUpDate == null ? DBNull.Value : (object)detail.FollowUpDate }
-        );
+        existing.Rating = detail.Rating;
+        existing.CommentText = detail.CommentText;
+        existing.FollowUpDate = detail.FollowUpDate;
 
-        return await GetByIdAsync(detail.ReviewId, detail.SkillKey);
+        await _footballContext.SaveChangesAsync();
+
+        return existing;
     }
 
     public async Task<bool> DeleteAsync(string reviewId, string skillKey)
     {
-        var result = await _db.ExecuteScalarAsync(
-            "SELECT stf.fn_review_skill_details_delete(@p_review_id, @p_skill_key)",
-            new NpgsqlParameter("p_review_id", NpgsqlDbType.Varchar) { Value = reviewId },
-            new NpgsqlParameter("p_skill_key", NpgsqlDbType.Varchar) { Value = skillKey }
-        );
-        return Convert.ToInt32(result ?? 0) > 0;
-    }
+        var existing = await _footballContext.ReviewSkillDetails
+            .FirstOrDefaultAsync(r => r.ReviewId == reviewId && r.SkillKey == skillKey);
 
-    private ReviewSkillDetail MapReaderToReviewSkillDetail(NpgsqlDataReader reader)
-    {
-        return new ReviewSkillDetail
-        {
-            ReviewId = reader["review_id"].ToString()!,
-            SkillKey = reader["skill_key"].ToString()!,
-            Rating = (decimal)reader["rating"],
-            CommentText = reader["comment_text"] == DBNull.Value ? null : reader["comment_text"].ToString(),
-            FollowUpDate = reader["follow_up_date"] == DBNull.Value ? null : (DateOnly?)DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("follow_up_date")))
-        };
+        if (existing == null)
+            return false;
+
+        _footballContext.ReviewSkillDetails.Remove(existing);
+        return await _footballContext.SaveChangesAsync() > 0;
     }
 }

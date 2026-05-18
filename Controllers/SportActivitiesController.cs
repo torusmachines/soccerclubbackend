@@ -62,10 +62,7 @@ namespace FootballDashboardAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSportActivity(int id, SportActivity sportActivity)
         {
-            if (id != sportActivity.ActivityId)
-            {
-                return BadRequest();
-            }
+            sportActivity.ActivityId = id;
 
             _context.Entry(sportActivity).State = EntityState.Modified;
 
@@ -85,7 +82,7 @@ namespace FootballDashboardAPI.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(sportActivity);
         }
 
         // POST: api/SportActivities

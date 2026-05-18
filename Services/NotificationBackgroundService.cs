@@ -19,7 +19,7 @@ public class NotificationBackgroundService : BackgroundService
         _logger = logger;
     }
 
-    protected override async SystemTask ExecuteAsync(CancellationToken stoppingToken)
+        protected override async SystemTask ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Notification service started");
 
@@ -42,43 +42,16 @@ public class NotificationBackgroundService : BackgroundService
     private async SystemTask CheckAndSendNotifications()
     {
         using var scope = _services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<FootballContext>();
-        var emailService = scope.ServiceProvider.GetRequiredService<IEmailNotificationService>();
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-
-        // ── 1. Contract expiry alerts (within 90 days) ───────────────
-        // ✅ Fix: use context.Set<Player1>() instead of context.Player1s
-        var expiringPlayers = await context.Set<Player1>()
-            .Include(p => p.AgentScout)
-            .Where(p => p.ContractEndDate != null &&
-                        p.ContractEndDate <= today.AddDays(90) &&
-                        p.ContractEndDate >= today)
-            .ToListAsync();
-
-        _logger.LogInformation("Found {Count} expiring contracts", expiringPlayers.Count);
-
-        foreach (var player in expiringPlayers)
-        {
-            if (player.AgentScout == null) continue;
-
-            var scoutEmail = player.ContactInfo;
-            if (string.IsNullOrEmpty(scoutEmail)) continue;
-
-            await emailService.SendContractExpiryAlertAsync(
-                toEmail: scoutEmail,
-                playerName: player.FullName,
-                contractEndDate: player.ContractEndDate.ToString()!,
-                scoutName: player.AgentScout.ScoutName
-            );
-        }
+                var context = scope.ServiceProvider.GetRequiredService<FootballContext>();
+                var emailService = scope.ServiceProvider.GetRequiredService<IEmailNotificationService>();
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         // ── 2. Task due alerts (due within 3 days) ───────────────────
         // ✅ Fix: use context.Set<Models.Task>() to avoid ambiguity
-        var dueTasks = await context.Set<FootballDashboardAPI.Models.Task>()
+        // --- Tasks due soon (within 3 days) ---
+        var dueTasks = await context.Tasks
             .Include(t => t.AssignedToScout)
-            .Where(t => t.Status == "open" &&
-                        t.DueDate <= today.AddDays(3) &&
-                        t.DueDate >= today)
+            .Where(t => t.Status == "open" && t.DueDate <= today.AddDays(3) && t.DueDate >= today)
             .ToListAsync();
 
         _logger.LogInformation("Found {Count} tasks due soon", dueTasks.Count);
@@ -87,8 +60,7 @@ public class NotificationBackgroundService : BackgroundService
         {
             if (task.AssignedToScout == null) continue;
 
-            // ✅ Fix: was wrongly using player.ContactInfo — use task's scout info
-            var scoutEmail = task.AssignedToScout.ScoutName; // ⚠️ replace with real email field on Scout if available
+            var scoutEmail = task.AssignedToScout.Email;
             if (string.IsNullOrEmpty(scoutEmail)) continue;
 
             await emailService.SendTaskDueAlertAsync(
@@ -98,6 +70,8 @@ public class NotificationBackgroundService : BackgroundService
                 assignedTo: task.AssignedToScout.ScoutName
             );
         }
+
+        
 
         // ── 3. Review follow-up reminders (due within 3 days) ────────
         var followUps = await context.Set<ReviewSkillDetail>()
@@ -116,7 +90,7 @@ public class NotificationBackgroundService : BackgroundService
         {
             if (detail.Review?.Scout == null) continue;
 
-            var scoutEmail = detail.Review.Player?.ContactInfo;
+            var scoutEmail = detail.Review.Scout?.Email;
             if (string.IsNullOrEmpty(scoutEmail)) continue;
 
             await emailService.SendReviewFollowUpAsync(

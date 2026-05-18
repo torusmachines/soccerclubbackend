@@ -1,5 +1,6 @@
 using FootballDashboardAPI.Models;
 using FootballDashboardAPI.Services;
+using FootballDashboardAPI.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,32 +12,43 @@ namespace FootballDashboardAPI.Controllers;
 public class ClubsController : ControllerBase
 {
     private readonly IClubService _clubService;
+    private readonly IEmailRepository _emailRepository;
 
-    public ClubsController(IClubService clubService)
+    public ClubsController(IClubService clubService, IEmailRepository emailRepository)
     {
         _clubService = clubService;
+        _emailRepository = emailRepository;
     }
 
     // GET: api/clubs
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Club>>> GetClubs()
+    public async Task<ActionResult<IEnumerable<FootballDashboardAPI.Models.ClubDto>>> GetClubs()
     {
         var clubs = await _clubService.GetAllClubsAsync();
         return Ok(clubs);
     }
 
+    // GET: api/clubs/{id}/clubmails
+    [HttpGet("{id}/clubmails")]
+    public async Task<ActionResult<IEnumerable<FootballDashboardAPI.Models.Email>>> GetClubMails(string id)
+    {
+        // Use repository to fetch emails related to the club
+        var emails = await _emailRepository.GetByClubIdAsync(id);
+        return Ok(emails);
+    }
+
     // GET: api/clubs/{id}
     [HttpGet("{id}")]
-    public async Task<ActionResult<Club>> GetClub(string id)
+    public async Task<ActionResult<FootballDashboardAPI.Models.Responses.ClubDetailsResponse>> GetClub(string id)
     {
-        var club = await _clubService.GetClubByIdAsync(id);
-        
-        if (club == null)
+        var response = await _clubService.GetClubDetailsAsync(id);
+
+        if (response == null)
         {
             return NotFound(new { message = $"Club with ID '{id}' not found." });
         }
 
-        return Ok(club);
+        return Ok(response);
     }
 
     // POST: api/clubs

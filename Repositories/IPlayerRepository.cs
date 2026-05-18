@@ -1,14 +1,28 @@
-using FootballDashboardAPI.Models;
 
-namespace FootballDashboardAPI.Repositories;
+
+using FootballDashboardAPI.Models;
+using FootballDashboardAPI.Models.Entities;
+using FootballDashboardAPI.Models.Responses;
+
+namespace FootballDashboardAPI.Repositories.Interfaces;
 
 public interface IPlayerRepository
 {
-    Task<IEnumerable<Player1>> GetAllAsync();
-    Task<Player1?> GetByIdAsync(long id);
-    Task<Player1?> GetByCustomIdAsync(long id);
-    Task<Player1> CreateAsync(Player1 player);
-    Task<Player1?> UpdateAsync(Player1 player);
-    Task<bool> DeleteAsync(long id);
-    Task<bool> ExistsAsync(long id);
+    Task<IEnumerable<PlayerListResponse>> GetPlayersDashboardAsync();
+    Task<IEnumerable<PlayerListResponse>> GetPlayersDashboardFilteredAsync(
+        string? positionCode,
+        string? scoutId,
+        int? sportId,
+        string? search,
+        string? restrictToScoutId);
+    Task<PlayerDetailsResponse?> GetPlayerDetailsAsync(string playerId);
+    Task<IEnumerable<PlayerReviewResponse>> GetPlayerReviewsAsync(string playerId);
+
+
+    Task<Models.Entities.Player?> GetByIdAsync(string id);
+    Task<Models.Entities.Player> CreateAsync(Models.Entities.Player player);
+    Task<Models.Entities.Player?> UpdateAsync(Models.Entities.Player player);
+    Task<bool> DeleteAsync(string id);
 }
+
+

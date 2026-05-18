@@ -31,6 +31,15 @@ public class ClubContactService : IClubContactService
         );
     }
 
+    public async Task<IEnumerable<ClubContact>> GetByClubIdAsync(string clubId)
+    {
+        return await _db.ExecuteQueryListAsync(
+            "SELECT * FROM stf.fn_club_contacts_get_by_club_id(@p_club_id)",
+            MapReaderToClubContact,
+            new NpgsqlParameter("p_club_id", NpgsqlDbType.Varchar) { Value = clubId }
+        );
+    }
+
     public async Task<ClubContact> CreateAsync(CreateClubContact c)
     {
         // Validate Club exists

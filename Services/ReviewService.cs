@@ -1,15 +1,20 @@
 using FootballDashboardAPI.Models;
 using FootballDashboardAPI.Repositories;
+using FootballDashboardAPI.Repositories.Interfaces;
 
 namespace FootballDashboardAPI.Services;
 
 public class ReviewService : IReviewService
 {
     private readonly IReviewRepository _reviewRepository;
+    private readonly IPlayerRepository _playerRepository;
+    private readonly IEmailNotificationService _emailService;
 
-    public ReviewService(IReviewRepository reviewRepository)
+    public ReviewService(IReviewRepository reviewRepository, IPlayerRepository playerRepository, IEmailNotificationService emailService)
     {
         _reviewRepository = reviewRepository;
+        _playerRepository = playerRepository;
+        _emailService = emailService;
     }
 
     public async Task<IEnumerable<Review>> GetAllReviewsAsync()
@@ -76,6 +81,23 @@ public class ReviewService : IReviewService
         };
 
         var createdReview = await _reviewRepository.CreateAsync(review);
+
+        // Notify player that a new review has been added (if player has an email)
+        try
+        {
+            var player = await _playerRepository.GetByIdAsync(createReviewDto.PlayerId);
+            if (player != null && !string.IsNullOrEmpty(player.PlayerEmail))
+            {
+                var subject = $"New review added for {player.FullName}";
+                var html = $"<div style='font-family:Arial,sans-serif'><p>Hi {player.FullName},</p><p>A new review has been added to your profile. Please log in to view details.</p></div>";
+                await _emailService.SendEmailAsync(player.PlayerEmail, player.FullName, subject, html);
+            }
+        }
+        catch
+        {
+            // swallow email errors - review creation should not fail because of email issues
+        }
+
         return MapToDto(createdReview);
     }
 

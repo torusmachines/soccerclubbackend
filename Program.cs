@@ -136,7 +136,8 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("https://soccerclubfrontend.onrender.com")
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowCredentials()
+              .WithExposedHeaders("Authorization");
     });
 });
 

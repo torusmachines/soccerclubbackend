@@ -45,14 +45,14 @@ public partial class Player1
     public string? CurrentClubId { get; set; }
 
     [Column("contract_start_date")]
-    public DateOnly ContractStartDate { get; set; }
+    public DateOnly? ContractStartDate { get; set; }
 
     [Column("contract_end_date")]
-    public DateOnly ContractEndDate { get; set; }
+    public DateOnly? ContractEndDate { get; set; }
 
     [Column("agent_name")]
     [StringLength(150)]
-    public string AgentName { get; set; } = null!;
+    public string? AgentName { get; set; } = null!;
 
     [Column("player_email")]
     [StringLength(255)]
@@ -60,7 +60,7 @@ public partial class Player1
 
     [Column("agent_scout_id")]
     [StringLength(50)]
-    public string AgentScoutId { get; set; } = null!;
+    public string? AgentScoutId { get; set; } = null!;
 
     [Column("contact_info")]
     [StringLength(255)]
@@ -78,6 +78,103 @@ public partial class Player1
 
     [Column("contract_end_with_coach")]
     public DateOnly? ContractEndWithCoach { get; set; }
+
+    [Column("address_line1")]
+    [StringLength(150)]
+    public string? AddressLine1 { get; set; }
+
+    [Column("address_line2")]
+    [StringLength(150)]
+    public string? AddressLine2 { get; set; }
+
+    [Column("city")]
+    [StringLength(100)]
+    public string? City { get; set; }
+
+    [Column("state")]
+    [StringLength(100)]
+    public string? State { get; set; }
+
+    [Column("country")]
+    [StringLength(100)]
+    public string? Country { get; set; }
+
+    [Column("postal_code")]
+    [StringLength(20)]
+    public string? PostalCode { get; set; }
+
+    [Column("gender")]
+    [StringLength(10)]
+    public string? Gender { get; set; }
+
+    [Column("place_of_birth")]
+    [StringLength(100)]
+    public string? PlaceOfBirth { get; set; }
+
+    [Column("primary_language")]
+    [StringLength(50)]
+    public string? PrimaryLanguage { get; set; }
+
+    [Column("secondary_language")]
+    [StringLength(50)]
+    public string? SecondaryLanguage { get; set; }
+
+    [Column("profile_visibility")]
+    public bool? ProfileVisibility { get; set; }
+
+    [Column("phone_number")]
+    [StringLength(20)]
+    public string? PhoneNumber { get; set; }
+
+    [Column("alternate_phone")]
+    [StringLength(20)]
+    public string? AlternatePhone { get; set; }
+
+    [Column("emergency_contact_name")]
+    [StringLength(100)]
+    public string? EmergencyContactName { get; set; }
+
+    [Column("emergency_contact_number")]
+    [StringLength(20)]
+    public string? EmergencyContactNumber { get; set; }
+
+    [Column("secondary_position")]
+    [StringLength(50)]
+    public string? SecondaryPosition { get; set; }
+
+    [Column("jersey_number")]
+    public int? JerseyNumber { get; set; }
+
+    [Column("experience_years")]
+    public int? ExperienceYears { get; set; }
+
+    [Column("playing_level")]
+    [StringLength(20)]
+    public string? PlayingLevel { get; set; }
+
+    [Column("dominant_side")]
+    [StringLength(10)]
+    public string? DominantSide { get; set; }
+
+    [Column("fitness_level")]
+    [StringLength(20)]
+    public string? FitnessLevel { get; set; }
+
+    [Column("injury_status")]
+    [StringLength(20)]
+    public string? InjuryStatus { get; set; }
+
+    [Column("coach_email")]
+    [StringLength(100)]
+    public string? CoachEmail { get; set; }
+
+    [Column("coach_phone")]
+    [StringLength(20)]
+    public string? CoachPhone { get; set; }
+
+    [Column("user_status")]
+    [StringLength(20)]
+    public string UserStatus { get; set; } = "Approved";
 
     [Column("created_at")]
     [Precision(0)]

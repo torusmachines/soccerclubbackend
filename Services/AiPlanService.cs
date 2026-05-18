@@ -44,7 +44,7 @@ public class AiPlanService : IAiPlanService
         var previousPlans = await GetPreviousPlansAsync(playerId);
         var version = await GetNextVersionAsync(playerId);
 
-        // Persist input details first as requested, then fill generated content.
+        // Prepare plan entity but do not persist until AI response succeeds to avoid empty DB rows on failures.
         var planId = Guid.NewGuid().ToString();
         var aiPlan = new PlayerAiPlan
         {
@@ -53,17 +53,14 @@ public class AiPlanService : IAiPlanService
             PlanJson = "{}",
             Version = version,
             SkillType = normalizedRequest.SkillType,
-            CurrentLevel = normalizedRequest.CurrentLevel,
-            TargetLevel = normalizedRequest.TargetLevel,
             DurationWeeks = normalizedRequest.DurationWeeks,
             TrainingDaysPerWeek = normalizedRequest.TrainingDaysPerWeek,
             SessionDurationMinutes = normalizedRequest.SessionDurationMinutes,
-            HasInjury = normalizedRequest.HasInjury,
-            InjuryDetails = normalizedRequest.HasInjury ? normalizedRequest.InjuryDetails?.Trim() : null,
+            TopNRatings = normalizedRequest.TopNRatings,
+            CurrentRating = normalizedRequest.CurrentRating,
+            TargetRating = normalizedRequest.TargetRating,
             CreatedAt = DateTime.UtcNow
         };
-        _context.PlayerAiPlans.Add(aiPlan);
-        await _context.SaveChangesAsync();
 
         // Preprocess data
         var processedData = PreprocessPlayerData(player, notes, reviews, ratings, previousPlans);
@@ -82,6 +79,9 @@ public class AiPlanService : IAiPlanService
         aiPlan.PlanJson = JsonSerializer.Serialize(planContent);
         aiPlan.RawText = aiResponse;
         aiPlan.PdfPath = pdfPath;
+
+        // Add and persist the completed plan only after successful AI response and PDF generation.
+        _context.PlayerAiPlans.Add(aiPlan);
         await _context.SaveChangesAsync();
 
         return MapToResponse(aiPlan, planContent);
@@ -96,8 +96,7 @@ public class AiPlanService : IAiPlanService
 
         if (latestPlan == null)
         {
-            _logger.LogInformation("No AI plan found for player {PlayerId}. Generating a new plan.", playerId);
-            return await GenerateAiPlanAsync(playerId);
+            return null;
         }
 
         var planContent = JsonSerializer.Deserialize<AiPlanContent>(latestPlan.PlanJson);
@@ -110,13 +109,6 @@ public class AiPlanService : IAiPlanService
             .Where(p => p.PlayerId == playerId)
             .OrderByDescending(p => p.Version)
             .ToListAsync();
-
-        if (!plans.Any())
-        {
-            _logger.LogInformation("No AI history found for player {PlayerId}. Generating first plan.", playerId);
-            var generatedPlan = await GenerateAiPlanAsync(playerId);
-            return new AiPlanHistoryResponse { Plans = new List<AiPlanResponse> { generatedPlan } };
-        }
 
         var planResponses = new List<AiPlanResponse>();
 
@@ -147,23 +139,30 @@ public class AiPlanService : IAiPlanService
             .ToListAsync();
     }
 
-    private async Task<List<ReviewRating>> GetPlayerRatingsAsync(string playerId)
+    private async Task<List<ReviewActivityRating>> GetPlayerRatingsAsync(string playerId)
     {
-        return await _context.ReviewRatings
+        return await _context.ReviewActivityRatings
             .Where(rr => _context.Reviews.Any(r => r.ReviewId == rr.ReviewId && r.PlayerId == playerId))
-            .Include(rr => rr.Review)
-            .OrderByDescending(rr => rr.Review!.CreatedAt)
+            .OrderByDescending(rr => rr.CreatedAt)
             .Take(10) // Limit to last 10 rating sets
             .ToListAsync();
     }
 
     private async Task<List<PlayerAiPlan>> GetPreviousPlansAsync(string playerId)
     {
-        return await _context.PlayerAiPlans
-            .Where(p => p.PlayerId == playerId)
-            .OrderByDescending(p => p.Version)
-            .Take(3) // Get last 3 plans
-            .ToListAsync();
+        try
+        {
+            return await _context.PlayerAiPlans
+                .Where(p => p.PlayerId == playerId)
+                .OrderByDescending(p => p.Version)
+                .Take(3) // Get last 3 plans
+                .ToListAsync();
+        }
+        catch(Exception ex)
+        {
+            return new List<PlayerAiPlan>();
+            Console.WriteLine(ex);
+        }
     }
 
     private async Task<int> GetNextVersionAsync(string playerId)
@@ -179,7 +178,7 @@ public class AiPlanService : IAiPlanService
         Player1 player,
         List<Note> notes,
         List<Review> reviews,
-        List<ReviewRating> ratings,
+        List<ReviewActivityRating> ratings,
         List<PlayerAiPlan> previousPlans)
     {
         // Calculate age
@@ -216,7 +215,7 @@ public class AiPlanService : IAiPlanService
         };
     }
 
-    private Dictionary<string, object> CalculateRatingTrends(List<ReviewRating> ratings)
+    private Dictionary<string, object> CalculateRatingTrends(List<ReviewActivityRating> ratings)
     {
         if (!ratings.Any())
         {
@@ -225,26 +224,37 @@ public class AiPlanService : IAiPlanService
 
         var trends = new Dictionary<string, object>();
 
-        // Calculate average ratings
-        trends["passing"] = ratings.Average(r => (double)r.Passing);
-        trends["shooting"] = ratings.Average(r => (double)r.Shooting);
-        trends["dribbling"] = ratings.Average(r => (double)r.Dribbling);
-        trends["tacticalAwareness"] = ratings.Average(r => (double)r.TacticalAwareness);
-        trends["defensiveContribution"] = ratings.Average(r => (double)r.DefensiveContribution);
-        trends["physicalStrength"] = ratings.Average(r => (double)r.PhysicalStrength);
-        trends["behavior"] = ratings.Average(r => (double)r.Behavior);
-        trends["overallPerformance"] = ratings.Average(r => (double)r.OverallPerformance);
+        // Look up activity names for the rating entries
+        var activityIds = ratings.Select(r => r.ActivityId).Distinct().ToList();
+        var activityNames = _context.SportActivities
+            .Where(sa => activityIds.Contains(sa.ActivityId))
+            .ToDictionary(sa => sa.ActivityId, sa => sa.ActivityName.ToLower().Replace(" ", ""));
 
-        // Calculate trend direction (simple: compare first half vs second half)
+        // Calculate average rating per activity
+        var grouped = ratings.GroupBy(r => r.ActivityId);
+        foreach (var group in grouped)
+        {
+            var key = activityNames.GetValueOrDefault(group.Key, $"activity_{group.Key}");
+            trends[key] = group.Average(r => (double)r.Rating);
+        }
+
+        // Calculate trend direction (recent half vs older half; list is ordered desc)
         var midPoint = ratings.Count / 2;
         if (midPoint > 0)
         {
-            var firstHalf = ratings.Take(midPoint);
-            var secondHalf = ratings.Skip(midPoint);
+            var recentRatings = ratings.Take(midPoint);
+            var olderRatings = ratings.Skip(midPoint);
 
-            trends["passing_trend"] = secondHalf.Average(r => (double)r.Passing) - firstHalf.Average(r => (double)r.Passing);
-            trends["shooting_trend"] = secondHalf.Average(r => (double)r.Shooting) - firstHalf.Average(r => (double)r.Shooting);
-            trends["overall_trend"] = secondHalf.Average(r => (double)r.OverallPerformance) - firstHalf.Average(r => (double)r.OverallPerformance);
+            var recentByActivity = recentRatings.GroupBy(r => r.ActivityId)
+                .ToDictionary(g => g.Key, g => g.Average(r => (double)r.Rating));
+            var olderByActivity = olderRatings.GroupBy(r => r.ActivityId)
+                .ToDictionary(g => g.Key, g => g.Average(r => (double)r.Rating));
+
+            foreach (var activityId in recentByActivity.Keys.Intersect(olderByActivity.Keys))
+            {
+                var key = activityNames.GetValueOrDefault(activityId, $"activity_{activityId}");
+                trends[$"{key}_trend"] = recentByActivity[activityId] - olderByActivity[activityId];
+            }
         }
 
         return trends;
@@ -275,6 +285,25 @@ public class AiPlanService : IAiPlanService
 
     private string BuildAiPrompt(ProcessedPlayerData data, AiPlanGenerateRequest request)
     {
+        var currentRating = request.CurrentRating;
+        var targetRating = request.TargetRating;
+        var ratingGap = (currentRating.HasValue && targetRating.HasValue)
+            ? targetRating.Value - currentRating.Value
+            : (double?)null;
+
+        var ratingAnalysis = currentRating.HasValue
+            ? $"""
+Current Overall Rating : {currentRating.Value:F2} / 10
+Target Overall Rating  : {(targetRating.HasValue ? targetRating.Value.ToString("F2") + " / 10" : "Not set")}
+Rating Gap             : {(ratingGap.HasValue ? (ratingGap.Value >= 0 ? $"+{ratingGap.Value:F2} improvement needed" : $"{ratingGap.Value:F2} (already above target)") : "N/A")}
+Improvement Focus      : {(ratingGap.HasValue && ratingGap.Value > 0
+    ? ratingGap.Value >= 2.0 ? "Intensive improvement — large gap requires aggressive progressive overload"
+    : ratingGap.Value >= 1.0 ? "Moderate improvement — structured weekly progression with measurable milestones"
+    : "Fine-tuning — small gap, focus on consistency and peak performance maintenance"
+    : "Maintenance — player is at or above target, focus on sustaining current level")}
+"""
+            : "No overall rating data available — generate a general balanced development plan.";
+
         var prompt = $@"
 PLAYER PROFILE:
 Name: {data.Player.FullName}
@@ -284,28 +313,22 @@ Nationality: {data.Player.Nationality}
 
 PLAN PREFERENCES:
 Skill Focus: {request.SkillType}
-Current Level: {request.CurrentLevel}
-Target Level: {request.TargetLevel}
 Duration: {request.DurationWeeks} weeks
 Training Days Per Week: {request.TrainingDaysPerWeek}
 Session Duration: {request.SessionDurationMinutes} minutes
-Has Injury: {(request.HasInjury ? "Yes" : "No")}
-Injury Details: {(string.IsNullOrWhiteSpace(request.InjuryDetails) ? "N/A" : request.InjuryDetails)}
 
-CURRENT RATINGS (Average):
-Passing: {data.RatingTrends.GetValueOrDefault("passing", "N/A")}
-Shooting: {data.RatingTrends.GetValueOrDefault("shooting", "N/A")}
-Dribbling: {data.RatingTrends.GetValueOrDefault("dribbling", "N/A")}
-Tactical Awareness: {data.RatingTrends.GetValueOrDefault("tacticalAwareness", "N/A")}
-Defensive Contribution: {data.RatingTrends.GetValueOrDefault("defensiveContribution", "N/A")}
-Physical Strength: {data.RatingTrends.GetValueOrDefault("physicalStrength", "N/A")}
-Behavior: {data.RatingTrends.GetValueOrDefault("behavior", "N/A")}
-Overall Performance: {data.RatingTrends.GetValueOrDefault("overallPerformance", "N/A")}
+RATING ANALYSIS (Overall skill score averaged across all rated activities):
+{ratingAnalysis}
 
-RATING TRENDS:
-Passing Trend: {data.RatingTrends.GetValueOrDefault("passing_trend", "N/A")}
-Shooting Trend: {data.RatingTrends.GetValueOrDefault("shooting_trend", "N/A")}
-Overall Trend: {data.RatingTrends.GetValueOrDefault("overall_trend", "N/A")}
+INDIVIDUAL ACTIVITY RATINGS (Average per activity):
+{string.Join("\n", data.RatingTrends
+    .Where(kv => !kv.Key.EndsWith("_trend"))
+    .Select(kv => $"{kv.Key}: {(kv.Value is double d ? d.ToString("F2") : kv.Value)}"))}
+
+ACTIVITY RATING TRENDS (positive = improving, negative = declining):
+{string.Join("\n", data.RatingTrends
+    .Where(kv => kv.Key.EndsWith("_trend"))
+    .Select(kv => $"{kv.Key.Replace("_trend", "")}: {(kv.Value is double d ? (d >= 0 ? $"+{d:F2}" : d.ToString("F2")) : kv.Value)}"))}
 
 NOTES BY CATEGORY:
 ";
@@ -342,8 +365,16 @@ NOTES BY CATEGORY:
         {
             prompt += "- Injury risks detected: Include preventive exercises and recovery focus\n";
         }
+        if (ratingGap.HasValue && ratingGap.Value >= 2.0)
+        {
+            prompt += "- Large rating gap: Use aggressive progressive overload with weekly difficulty increases\n";
+        }
+        else if (ratingGap.HasValue && ratingGap.Value > 0 && ratingGap.Value < 1.0)
+        {
+            prompt += "- Small rating gap: Focus on consistency, peaking, and maintaining elite habits\n";
+        }
 
-        prompt += "\nGenerate a comprehensive development plan following the strict JSON format.";
+        prompt += $"\nGenerate a comprehensive development plan tailored to bring the player from rating {(currentRating.HasValue ? currentRating.Value.ToString("F2") : "unknown")} to {(targetRating.HasValue ? targetRating.Value.ToString("F2") : "their best potential")} within {request.DurationWeeks} weeks. Follow the strict JSON format.";
 
         return prompt;
     }
@@ -355,13 +386,10 @@ NOTES BY CATEGORY:
             return new AiPlanGenerateRequest
             {
                 SkillType = "General Development",
-                CurrentLevel = "Intermediate",
-                TargetLevel = "Advanced",
                 DurationWeeks = 4,
                 TrainingDaysPerWeek = 4,
                 SessionDurationMinutes = 60,
-                HasInjury = false,
-                InjuryDetails = null
+                TopNRatings = 3
             };
         }
 
@@ -370,9 +398,10 @@ NOTES BY CATEGORY:
             throw new ArgumentException("Skill type is required.");
         }
 
-        if (request.HasInjury && string.IsNullOrWhiteSpace(request.InjuryDetails))
+        // Clamp TopNRatings to [1, 5]
+        if (request.TopNRatings < 1 || request.TopNRatings > 5)
         {
-            throw new ArgumentException("Injury details are required when injury is marked as true.");
+            request.TopNRatings = Math.Clamp(request.TopNRatings, 1, 5);
         }
 
         return request;
@@ -388,13 +417,12 @@ NOTES BY CATEGORY:
             Version = planEntity.Version,
             CreatedAt = planEntity.CreatedAt,
             SkillType = planEntity.SkillType,
-            CurrentLevel = planEntity.CurrentLevel,
-            TargetLevel = planEntity.TargetLevel,
             DurationWeeks = planEntity.DurationWeeks,
             TrainingDaysPerWeek = planEntity.TrainingDaysPerWeek,
             SessionDurationMinutes = planEntity.SessionDurationMinutes,
-            HasInjury = planEntity.HasInjury,
-            InjuryDetails = planEntity.InjuryDetails,
+            TopNRatings = planEntity.TopNRatings,
+            CurrentRating = planEntity.CurrentRating,
+            TargetRating = planEntity.TargetRating,
             PdfPath = planEntity.PdfPath
         };
     }
@@ -420,12 +448,11 @@ NOTES BY CATEGORY:
             $"Plan Version: {version}",
             $"Generated On: {DateTime.UtcNow:yyyy-MM-dd HH:mm} UTC",
             $"Skill Focus: {request.SkillType}",
-            $"Level: {request.CurrentLevel} -> {request.TargetLevel}",
+            $"Current Rating: {(request.CurrentRating.HasValue ? request.CurrentRating.Value.ToString("F2") : "N/A")}",
+            $"Target Rating: {(request.TargetRating.HasValue ? request.TargetRating.Value.ToString("F2") : "N/A")}",
             $"Duration: {request.DurationWeeks} weeks",
             $"Training Days/Week: {request.TrainingDaysPerWeek}",
             $"Session Duration: {request.SessionDurationMinutes} mins",
-            $"Has Injury: {(request.HasInjury ? "Yes" : "No")}",
-            $"Injury Details: {(string.IsNullOrWhiteSpace(request.InjuryDetails) ? "N/A" : request.InjuryDetails)}",
             "",
             "Summary:",
             planContent.Summary

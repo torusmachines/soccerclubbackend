@@ -1,170 +1,56 @@
-using FootballDashboardAPI.Models;
-using FootballDashboardAPI.Repositories;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using FootballDashboardAPI.Models.Responses;
+using FootballDashboardAPI.Repositories.Interfaces;
+using FootballDashboardAPI.Services.Interfaces;
 
 namespace FootballDashboardAPI.Services;
 
 public class PlayerService : IPlayerService
 {
     private readonly IPlayerRepository _playerRepository;
-    private readonly UserManager<ApplicationUser> _userManager;
 
-    public PlayerService(IPlayerRepository playerRepository, UserManager<ApplicationUser> userManager)
+    public PlayerService(IPlayerRepository playerRepository)
     {
         _playerRepository = playerRepository;
-        _userManager = userManager;
     }
 
-    public async Task<IEnumerable<Player>> GetAllPlayersAsync()
+    public async Task<IEnumerable<PlayerListResponse>> GetPlayersDashboardAsync()
     {
-        var players = await _playerRepository.GetAllAsync();
-        return players.Select(MapToDto);
+        return await _playerRepository.GetPlayersDashboardAsync();
     }
 
-    public async Task<Player?> GetPlayerByIdAsync(long id)   
+    public async Task<IEnumerable<PlayerListResponse>> GetPlayersDashboardFilteredAsync(
+        string? positionCode,
+        string? scoutId,
+        int? sportId,
+        string? search,
+        string? restrictToScoutId)
     {
-        var player = await _playerRepository.GetByIdAsync(id);
-        return player == null ? null : MapToDto(player);
+        return await _playerRepository.GetPlayersDashboardFilteredAsync(
+            positionCode,
+            scoutId,
+            sportId,
+            search,
+            restrictToScoutId);
     }
 
-    public async Task<Player> CreatePlayerAsync(CreatePlayer createPlayerDto)
+    public async Task<PlayerDetailsResponse?> GetPlayerDetailsAsync(string playerId)
     {
-        var player = new Player1
-        {
-            //PlayerId = Guid.NewGuid().ToString(),
-            FullName = createPlayerDto.FullName,
-            DateOfBirth = createPlayerDto.DateOfBirth ?? DateOnly.FromDateTime(DateTime.Now),
-            Nationality = createPlayerDto.Nationality ?? string.Empty,
-            PositionCode = createPlayerDto.Position ?? string.Empty,
-            PreferredFoot = createPlayerDto.PreferredFoot ?? string.Empty,
-            HeightCm = createPlayerDto.HeightCm ?? 0,
-            WeightKg = createPlayerDto.WeightKg ?? 0,
-            CurrentClubId = createPlayerDto.CurrentClub,
-            ContractStartDate = createPlayerDto.ContractStart ?? DateOnly.FromDateTime(DateTime.Now),
-            ContractEndDate = createPlayerDto.ContractEnd ?? DateOnly.FromDateTime(DateTime.Now.AddYears(1)),
-            AgentName = createPlayerDto.AgentName ?? string.Empty,
-
-            //AgentScoutId = Guid.NewGuid().ToString(),
-            AgentScoutId = createPlayerDto.AgentScoutId ?? string.Empty,
-            ContactInfo = createPlayerDto.ContactInfo ?? string.Empty,
-            ProfileImageUrl = createPlayerDto.ProfileImage ?? null,
-            playerEmail = createPlayerDto.PlayerEmail ?? string.Empty,
-            SportId = createPlayerDto.SportId,
-            ContractStartWithCoach = createPlayerDto.ContractStartWithCoach,
-            ContractEndWithCoach = createPlayerDto.ContractEndWithCoach,
-
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        var createdPlayer = await _playerRepository.CreateAsync(player);
-        return MapToDto(createdPlayer);
+        return await _playerRepository.GetPlayerDetailsAsync(playerId);
     }
 
-    public async Task<Player?> UpdatePlayerAsync(long id, UpdatePlayer updatePlayerDto)
+    public async Task<FootballDashboardAPI.Models.Entities.Player> CreatePlayerAsync(FootballDashboardAPI.Models.Entities.Player player)
     {
-        var existingPlayer = await _playerRepository.GetByIdAsync(id);
-        if (existingPlayer == null)
-            return null;
-
-        var player = new Player1
-        {
-            PlayerId = existingPlayer.PlayerId,
-            FullName = updatePlayerDto.FullName,
-            DateOfBirth = updatePlayerDto.DateOfBirth ?? existingPlayer.DateOfBirth,
-            Nationality = updatePlayerDto.Nationality ?? existingPlayer.Nationality,
-            PositionCode = updatePlayerDto.Position ?? existingPlayer.PositionCode,
-            PreferredFoot = updatePlayerDto.PreferredFoot ?? existingPlayer.PreferredFoot,
-            HeightCm = updatePlayerDto.HeightCm ?? existingPlayer.HeightCm,
-            WeightKg = updatePlayerDto.WeightKg ?? existingPlayer.WeightKg,
-            CurrentClubId = updatePlayerDto.CurrentClub ?? existingPlayer.CurrentClubId,
-            ContractStartDate = updatePlayerDto.ContractStart ?? existingPlayer.ContractStartDate,
-            ContractEndDate = updatePlayerDto.ContractEnd ?? existingPlayer.ContractEndDate,
-            AgentName = updatePlayerDto.AgentName ?? existingPlayer.AgentName,
-            //AgentScoutId = existingPlayer.AgentScoutId,
-            CreatedAt = existingPlayer.CreatedAt,
-            UpdatedAt = DateTime.UtcNow,
-
-            AgentScoutId = updatePlayerDto.AgentScoutId ?? existingPlayer.AgentScoutId,
-            ContactInfo = updatePlayerDto.ContactInfo ?? existingPlayer.ContactInfo,
-            ProfileImageUrl = updatePlayerDto.ProfileImage ?? existingPlayer.ProfileImageUrl,
-            SportId = updatePlayerDto.SportId ?? existingPlayer.SportId,
-            ContractStartWithCoach = updatePlayerDto.ContractStartWithCoach ?? existingPlayer.ContractStartWithCoach,
-            ContractEndWithCoach = updatePlayerDto.ContractEndWithCoach ?? existingPlayer.ContractEndWithCoach,
-        };
-
-        var updatedPlayer = await _playerRepository.UpdateAsync(player);
-        if (updatedPlayer != null)
-        {
-            await SyncAuthUserFullNameAsync(existingPlayer, updatedPlayer);
-        }
-        return updatedPlayer == null ? null : MapToDto(updatedPlayer);
+        return await _playerRepository.CreateAsync(player);
     }
 
-    public async Task<bool> DeletePlayerAsync(long id)
+    public async Task<FootballDashboardAPI.Models.Entities.Player?> UpdatePlayerAsync(FootballDashboardAPI.Models.Entities.Player player)
     {
-        return await _playerRepository.DeleteAsync(id);
+        return await _playerRepository.UpdateAsync(player);
     }
 
-    private static Player MapToDto(Player1 player)
+    public async Task<bool> DeletePlayerAsync(string playerId)
     {
-        return new Player
-        {
-            Id = long.TryParse(player.PlayerId, out var id) ? id : 0,
-            FullName = player.FullName,
-            DateOfBirth = player.DateOfBirth,
-            Nationality = player.Nationality,
-            Position = player.PositionCode,
-            PreferredFoot = player.PreferredFoot,
-            HeightCm = player.HeightCm,
-            WeightKg = player.WeightKg,
-            CurrentClub = player.CurrentClubId,
-            ContractStart = player.ContractStartDate,
-            ContractEnd = player.ContractEndDate,
-            ContractStatus = null,
-            AgentName = player.AgentName,
-            CreatedAt = player.CreatedAt,
-            UpdatedAt = player.UpdatedAt,
-
-            contact_info = player.ContactInfo,
-            agent_scout_id = player.AgentScoutId,
-            profileImage = player.ProfileImageUrl,
-            PlayerEmail = player.playerEmail,
-            SportId = player.SportId,
-            SportName = player.Sport?.SportName,
-            ContractStartWithCoach = player.ContractStartWithCoach,
-            ContractEndWithCoach = player.ContractEndWithCoach,
-        };
-    }
-
-    private async System.Threading.Tasks.Task SyncAuthUserFullNameAsync(Player1 previousPlayer, Player1 updatedPlayer)
-    {
-        var previousName = previousPlayer.FullName?.Trim();
-        var updatedName = updatedPlayer.FullName?.Trim();
-
-        if (string.IsNullOrWhiteSpace(previousName) || string.IsNullOrWhiteSpace(updatedName))
-        {
-            return;
-        }
-
-        if (string.Equals(previousName, updatedName, StringComparison.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
-        var previousNameLower = previousName.ToLower();
-        var matchedUsers = await _userManager.Users
-            .Where(u => u.Role == "Player" && u.FullName.ToLower() == previousNameLower)
-            .ToListAsync();
-
-        if (matchedUsers.Count != 1)
-        {
-            return;
-        }
-
-        var identityUser = matchedUsers[0];
-        identityUser.FullName = updatedName;
-        await _userManager.UpdateAsync(identityUser);
+        return await _playerRepository.DeleteAsync(playerId);
     }
 }
+

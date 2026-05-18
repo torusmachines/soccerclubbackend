@@ -5,7 +5,7 @@ namespace FootballDashboardAPI.Services;
 
 public static class IdentitySeedService
 {
-    private static readonly string[] Roles = ["Admin", "Player", "Scout"];
+    private static readonly string[] Roles = ["Admin", "Player", "Scout", "Coach"];
 
     public static async System.Threading.Tasks.Task SeedAsync(IServiceProvider services, IConfiguration configuration)
     {
@@ -39,6 +39,7 @@ public static class IdentitySeedService
         var email = configuration["AdminSeed:Email"];
         var password = configuration["AdminSeed:Password"];
         var fullName = configuration["AdminSeed:FullName"] ?? "System Administrator";
+        var consentVersion = configuration["PrivacyPolicy:CurrentVersion"] ?? "v1.0";
 
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
         {
@@ -54,12 +55,19 @@ public static class IdentitySeedService
                 await userManager.AddToRoleAsync(existingUser, "Admin");
             }
 
-            if (!existingUser.IsActive || !existingUser.IsInviteAccepted || existingUser.Role != "Admin")
+            if (!existingUser.IsActive || !existingUser.IsInviteAccepted || existingUser.Role != "Admin"
+                || string.IsNullOrWhiteSpace(existingUser.ConsentVersion)
+                || !existingUser.ConsentGiven)
             {
                 existingUser.IsActive = true;
                 existingUser.IsInviteAccepted = true;
                 existingUser.EmailConfirmed = true;
                 existingUser.Role = "Admin";
+                existingUser.ConsentGiven = true;
+                existingUser.ConsentGivenAt ??= DateTime.UtcNow;
+                existingUser.ConsentVersion = string.IsNullOrWhiteSpace(existingUser.ConsentVersion)
+                    ? consentVersion
+                    : existingUser.ConsentVersion;
                 existingUser.FullName = string.IsNullOrWhiteSpace(existingUser.FullName) ? fullName : existingUser.FullName;
                 await userManager.UpdateAsync(existingUser);
             }
@@ -75,8 +83,12 @@ public static class IdentitySeedService
             FullName = fullName,
             Role = "Admin",
             IsActive = true,
+            ConsentGiven = true,
+            ConsentGivenAt = DateTime.UtcNow,
+            ConsentVersion = consentVersion,
             IsInviteAccepted = true,
             EmailConfirmed = true,
+            UserStatus = "Approved",
             CreatedAt = DateTime.UtcNow
         };
 

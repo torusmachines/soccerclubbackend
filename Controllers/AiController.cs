@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using FootballDashboardAPI.Services;
 using FootballDashboardAPI.Models;
@@ -38,6 +39,16 @@ public class AiController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating AI plan for player {PlayerId}", playerId);
+
+            // Detect AI provider/auth errors and return a 502 with a helpful message.
+            var msg = ex.Message ?? string.Empty;
+            if (msg.Contains("request failed", StringComparison.OrdinalIgnoreCase) ||
+                msg.Contains("unauthorized", StringComparison.OrdinalIgnoreCase) ||
+                msg.Contains("invalid api key", StringComparison.OrdinalIgnoreCase))
+            {
+                return StatusCode(502, "AI provider error: authentication failed or provider returned an error. Check AI provider configuration and API key.");
+            }
+
             return StatusCode(500, "An error occurred while generating the AI plan");
         }
     }

@@ -1,123 +1,77 @@
 ﻿using FootballDashboardAPI.Models;
-using Npgsql;
-using NpgsqlTypes;
+using Microsoft.EntityFrameworkCore;
 
 namespace FootballDashboardAPI.Repositories;
 
 public class ReviewRatingRepository : IReviewRatingRepository
 {
-    private readonly PostgresConnectionProvider _db;
+    private readonly FootballContext _footballContext;
 
-    public ReviewRatingRepository(PostgresConnectionProvider db)
+    public ReviewRatingRepository(FootballContext footballContext)
     {
-        _db = db;
+        _footballContext = footballContext;
     }
 
     public async Task<IEnumerable<ReviewRating>> GetAllAsync()
     {
-        return await _db.ExecuteQueryListAsync(
-            "SELECT * FROM stf.fn_review_ratings_get_all()",
-            MapReaderToReviewRating
-        );
+        return await _footballContext.ReviewRatings
+            .AsNoTracking()
+            .OrderBy(r => r.ReviewId)
+            .ToListAsync();
     }
 
     public async Task<ReviewRating?> GetByIdAsync(string id)
     {
-        return await _db.ExecuteQuerySingleAsync(
-            "SELECT * FROM stf.fn_review_ratings_get_by_id(@p_id)",
-            MapReaderToReviewRating,
-            new NpgsqlParameter("p_id", NpgsqlDbType.Varchar) { Value = id }
-        );
+        return await _footballContext.ReviewRatings
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.ReviewId == id);
     }
 
     public async Task<bool> ExistsAsync(string id)
     {
-        var result = await _db.ExecuteScalarAsync(
-            "SELECT stf.fn_review_ratings_exists(@p_id)",
-            new NpgsqlParameter("p_id", NpgsqlDbType.Varchar) { Value = id }
-        );
-        return Convert.ToInt32(result ?? 0) > 0;
+        return await _footballContext.ReviewRatings
+            .AsNoTracking()
+            .AnyAsync(r => r.ReviewId == id);
     }
 
     public async Task<ReviewRating> CreateAsync(ReviewRating rating)
     {
-        await _db.ExecuteNonQueryAsync(
-            "SELECT stf.fn_review_ratings_insert(@p_review_id, @p_passing, @p_shooting, @p_dribbling, @p_tactical_awareness, @p_defensive_contribution, @p_physical_strength, @p_behavior, @p_overall_performance)",
-            new NpgsqlParameter("p_review_id", NpgsqlDbType.Varchar)
-            { Value = rating.ReviewId },
-            new NpgsqlParameter("p_passing", NpgsqlDbType.Numeric)
-            { Value = rating.Passing },
-            new NpgsqlParameter("p_shooting", NpgsqlDbType.Numeric)
-            { Value = rating.Shooting },
-            new NpgsqlParameter("p_dribbling", NpgsqlDbType.Numeric)
-            { Value = rating.Dribbling },
-            new NpgsqlParameter("p_tactical_awareness", NpgsqlDbType.Numeric)
-            { Value = rating.TacticalAwareness },
-            new NpgsqlParameter("p_defensive_contribution", NpgsqlDbType.Numeric)
-            { Value = rating.DefensiveContribution },
-            new NpgsqlParameter("p_physical_strength", NpgsqlDbType.Numeric)
-            { Value = rating.PhysicalStrength },
-            new NpgsqlParameter("p_behavior", NpgsqlDbType.Numeric)
-            { Value = rating.Behavior },
-            new NpgsqlParameter("p_overall_performance", NpgsqlDbType.Numeric)
-            { Value = rating.OverallPerformance }
-        );
+        _footballContext.ReviewRatings.Add(rating);
+        await _footballContext.SaveChangesAsync();
 
-        return await GetByIdAsync(rating.ReviewId) ?? rating;
+        return rating;
     }
 
     public async Task<ReviewRating?> UpdateAsync(ReviewRating rating)
     {
-        var existing = await GetByIdAsync(rating.ReviewId);
+        var existing = await _footballContext.ReviewRatings
+            .FirstOrDefaultAsync(r => r.ReviewId == rating.ReviewId);
+
         if (existing == null) return null;
 
-        await _db.ExecuteNonQueryAsync(
-            "SELECT stf.fn_review_ratings_update(@p_review_id, @p_passing, @p_shooting, @p_dribbling, @p_tactical_awareness, @p_defensive_contribution, @p_physical_strength, @p_behavior, @p_overall_performance)",
-            new NpgsqlParameter("p_review_id", NpgsqlDbType.Varchar)
-            { Value = rating.ReviewId },
-            new NpgsqlParameter("p_passing", NpgsqlDbType.Numeric)
-            { Value = rating.Passing },
-            new NpgsqlParameter("p_shooting", NpgsqlDbType.Numeric)
-            { Value = rating.Shooting },
-            new NpgsqlParameter("p_dribbling", NpgsqlDbType.Numeric)
-            { Value = rating.Dribbling },
-            new NpgsqlParameter("p_tactical_awareness", NpgsqlDbType.Numeric)
-            { Value = rating.TacticalAwareness },
-            new NpgsqlParameter("p_defensive_contribution", NpgsqlDbType.Numeric)
-            { Value = rating.DefensiveContribution },
-            new NpgsqlParameter("p_physical_strength", NpgsqlDbType.Numeric)
-            { Value = rating.PhysicalStrength },
-            new NpgsqlParameter("p_behavior", NpgsqlDbType.Numeric)
-            { Value = rating.Behavior },
-            new NpgsqlParameter("p_overall_performance", NpgsqlDbType.Numeric)
-            { Value = rating.OverallPerformance }
-        );
+        existing.Passing = rating.Passing;
+        existing.Shooting = rating.Shooting;
+        existing.Dribbling = rating.Dribbling;
+        existing.TacticalAwareness = rating.TacticalAwareness;
+        existing.DefensiveContribution = rating.DefensiveContribution;
+        existing.PhysicalStrength = rating.PhysicalStrength;
+        existing.Behavior = rating.Behavior;
+        existing.OverallPerformance = rating.OverallPerformance;
 
-        return await GetByIdAsync(rating.ReviewId);
+        await _footballContext.SaveChangesAsync();
+
+        return existing;
     }
 
     public async Task<bool> DeleteAsync(string id)
     {
-        var result = await _db.ExecuteScalarAsync(
-            "SELECT stf.fn_review_ratings_delete(@p_id)",
-            new NpgsqlParameter("p_id", NpgsqlDbType.Varchar) { Value = id }
-        );
-        return Convert.ToInt32(result ?? 0) > 0;
-    }
+        var existing = await _footballContext.ReviewRatings
+            .FirstOrDefaultAsync(r => r.ReviewId == id);
 
-    private ReviewRating MapReaderToReviewRating(NpgsqlDataReader reader)
-    {
-        return new ReviewRating
-        {
-            ReviewId = reader["review_id"].ToString()!,
-            Passing = (decimal)reader["passing"],
-            Shooting = (decimal)reader["shooting"],
-            Dribbling = (decimal)reader["dribbling"],
-            TacticalAwareness = (decimal)reader["tactical_awareness"],
-            DefensiveContribution = (decimal)reader["defensive_contribution"],
-            PhysicalStrength = (decimal)reader["physical_strength"],
-            Behavior = (decimal)reader["behavior"],
-            OverallPerformance = (decimal)reader["overall_performance"]
-        };
+        if (existing == null)
+            return false;
+
+        _footballContext.ReviewRatings.Remove(existing);
+        return await _footballContext.SaveChangesAsync() > 0;
     }
 }

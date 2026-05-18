@@ -23,6 +23,13 @@ public class ClubContactsController : ControllerBase
         return Ok(await _service.GetAllAsync());
     }
 
+    [HttpGet("by-club/{clubId}")]
+    public async Task<ActionResult<IEnumerable<ClubContact>>> GetByClub(string clubId)
+    {
+        var items = await _service.GetByClubIdAsync(clubId);
+        return Ok(items);
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<ClubContact>> Get(string id)
     {

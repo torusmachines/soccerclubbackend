@@ -38,6 +38,12 @@ public partial class Note
     [Column("follow_up_date")]
     public DateOnly? FollowUpDate { get; set; }
 
+    [Column("meeting_date")]
+    public DateOnly? MeetingDate { get; set; }
+
+    [Column("attendees")]
+    public string? Attendees { get; set; }
+
     [Column("created_by_scout_id")]
     [StringLength(50)]
     public string CreatedByScoutId { get; set; } = null!;
@@ -69,6 +75,8 @@ public class CreateNote
     public string Description { get; set; } = null!;
     public string Category { get; set; } = null!;
     public DateOnly? FollowUpDate { get; set; }
+    public DateOnly? MeetingDate { get; set; }
+    public string? Attendees { get; set; }
     public bool IsVisibleToPlayer { get; set; } = false;
     public string CreatedByScoutId { get; set; } = null!;
 }
@@ -79,5 +87,7 @@ public class UpdateNote
     public string Description { get; set; } = null!;
     public string Category { get; set; } = null!;
     public DateOnly? FollowUpDate { get; set; }
+    public DateOnly? MeetingDate { get; set; }
+    public string? Attendees { get; set; }
     public bool IsVisibleToPlayer { get; set; } = false;
 }

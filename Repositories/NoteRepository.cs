@@ -1,184 +1,113 @@
 using FootballDashboardAPI.Models;
-using Npgsql;
-using NpgsqlTypes;
+using Microsoft.EntityFrameworkCore;
 
 namespace FootballDashboardAPI.Repositories;
 
 public class NoteRepository : INoteRepository
 {
-    private readonly PostgresConnectionProvider _db;
+    private readonly FootballContext _footballContext;
 
-    public NoteRepository(PostgresConnectionProvider db)
+    public NoteRepository(FootballContext footballContext)
     {
-        _db = db;
+        _footballContext = footballContext;
     }
 
     public async Task<IEnumerable<Note>> GetAllAsync()
     {
-        return await _db.ExecuteQueryListAsync(
-            "SELECT * FROM stf.fn_notes_get_all()",
-            MapReaderToNote
-        );
+        return await _footballContext.Notes
+            .AsNoTracking()
+            .OrderByDescending(n => n.CreatedAt)
+            .ToListAsync();
     }
 
     public async Task<Note?> GetByIdAsync(string id)
     {
-        return await _db.ExecuteQuerySingleAsync(
-            "SELECT * FROM stf.fn_notes_get_by_id(@p_id)",
-            MapReaderToNote,
-            new NpgsqlParameter("p_id", NpgsqlDbType.Varchar) { Value = id }
-        );
+        return await _footballContext.Notes
+            .AsNoTracking()
+            .FirstOrDefaultAsync(n => n.NoteId == id);
     }
 
     public async Task<IEnumerable<Note>> GetByPlayerIdAsync(string playerId)
     {
-        return await _db.ExecuteQueryListAsync(
-            "SELECT * FROM stf.fn_notes_get_by_player_id(@p_player_id)",
-            MapReaderToNote,
-            new NpgsqlParameter("p_player_id", NpgsqlDbType.Varchar) { Value = playerId }
-        );
+        return await _footballContext.Notes
+            .AsNoTracking()
+            .Where(n => n.PlayerId == playerId)
+            .OrderByDescending(n => n.CreatedAt)
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<Note>> GetByClubIdAsync(string clubId)
     {
-        return await _db.ExecuteQueryListAsync(
-            "SELECT * FROM stf.fn_notes_get_by_club_id(@p_club_id)",
-            MapReaderToNote,
-            new NpgsqlParameter("p_club_id", NpgsqlDbType.Varchar) { Value = clubId }
-        );
+        return await _footballContext.Notes
+            .AsNoTracking()
+            .Where(n => n.ClubId == clubId)
+            .OrderByDescending(n => n.CreatedAt)
+            .ToListAsync();
     }
 
     public async Task<bool> ExistsAsync(string id)
     {
-        var result = await _db.ExecuteScalarAsync(
-            "SELECT stf.fn_notes_exists(@p_id)",
-            new NpgsqlParameter("p_id", NpgsqlDbType.Varchar) { Value = id }
-        );
-        return Convert.ToInt32(result ?? 0) > 0;
+        return await _footballContext.Notes
+            .AsNoTracking()
+            .AnyAsync(n => n.NoteId == id);
     }
 
     public async Task<string?> GetMaxNoteIdAsync()
     {
-        var result = await _db.ExecuteScalarAsync(
-            "SELECT MAX(CAST(note_id AS INTEGER)) FROM stf.notes WHERE note_id ~ '^\\d+$'"
-        );
-        return result == null || result == DBNull.Value ? null : result.ToString();
+        var noteIds = await _footballContext.Notes
+            .AsNoTracking()
+            .Select(n => n.NoteId)
+            .ToListAsync();
+
+        var maxId = noteIds
+            .Select(id => int.TryParse(id, out var parsed) ? (int?)parsed : null)
+            .Max();
+
+        return maxId?.ToString();
     }
 
     public async Task<Note> CreateAsync(Note note)
     {
-        // Call old fn_notes_insert signature (without is_visible_to_player) for backward compatibility
-        await _db.ExecuteNonQueryAsync(
-            "SELECT stf.fn_notes_insert(@p_note_id, @p_topic, @p_description, @p_category, @p_created_by_scout_id, @p_created_at, @p_player_id, @p_club_id, @p_follow_up_date)",
-            new NpgsqlParameter("p_note_id", NpgsqlDbType.Varchar)
-            { Value = note.NoteId },
-            new NpgsqlParameter("p_topic", NpgsqlDbType.Varchar)
-            { Value = note.Topic },
-            new NpgsqlParameter("p_description", NpgsqlDbType.Text)
-            { Value = note.Description },
-            new NpgsqlParameter("p_category", NpgsqlDbType.Varchar)
-            { Value = note.Category },
-            new NpgsqlParameter("p_created_by_scout_id", NpgsqlDbType.Varchar)
-            { Value = note.CreatedByScoutId },
-            new NpgsqlParameter("p_created_at", NpgsqlDbType.Timestamp)
-            { Value = DateTime.SpecifyKind(note.CreatedAt, DateTimeKind.Unspecified) },
-            new NpgsqlParameter("p_player_id", NpgsqlDbType.Varchar)
-            { Value = note.PlayerId == null ? DBNull.Value : (object)note.PlayerId },
-            new NpgsqlParameter("p_club_id", NpgsqlDbType.Varchar)
-            { Value = note.ClubId == null ? DBNull.Value : (object)note.ClubId },
-            new NpgsqlParameter("p_follow_up_date", NpgsqlDbType.Date)
-            { Value = note.FollowUpDate == null ? DBNull.Value : (object)note.FollowUpDate }
-        );
+        note.PlayerId = string.IsNullOrWhiteSpace(note.PlayerId) ? null : note.PlayerId;
+        note.ClubId = string.IsNullOrWhiteSpace(note.ClubId) ? null : note.ClubId;
 
-        // Ensure is_visible_to_player column is updated if DB supports it
-        try
-        {
-            await _db.ExecuteNonQueryAsync(
-                "UPDATE stf.notes SET is_visible_to_player = @p_is_visible_to_player WHERE note_id = @p_note_id",
-                new NpgsqlParameter("p_is_visible_to_player", NpgsqlDbType.Boolean) { Value = note.IsVisibleToPlayer },
-                new NpgsqlParameter("p_note_id", NpgsqlDbType.Varchar) { Value = note.NoteId }
-            );
-        }
-        catch (PostgresException) // if the column doesn't exist or function etc.
-        {
-            // Ignore; new DB schema may not be applied yet.
-        }
+        _footballContext.Notes.Add(note);
+        await _footballContext.SaveChangesAsync();
 
-        return await GetByIdAsync(note.NoteId) ?? note;
+        return note;
     }
 
     public async Task<Note?> UpdateAsync(Note note)
     {
-        await _db.ExecuteNonQueryAsync(
-            "SELECT stf.fn_notes_update(@p_note_id, @p_topic, @p_description, @p_category, @p_follow_up_date)",
-            new NpgsqlParameter("p_note_id", NpgsqlDbType.Varchar)
-            { Value = note.NoteId },
-            new NpgsqlParameter("p_topic", NpgsqlDbType.Varchar)
-            { Value = note.Topic },
-            new NpgsqlParameter("p_description", NpgsqlDbType.Text)
-            { Value = note.Description },
-            new NpgsqlParameter("p_category", NpgsqlDbType.Varchar)
-            { Value = note.Category },
-            new NpgsqlParameter("p_follow_up_date", NpgsqlDbType.Date)
-            { Value = note.FollowUpDate == null ? DBNull.Value : (object)note.FollowUpDate }
-        );
+        var existing = await _footballContext.Notes
+            .FirstOrDefaultAsync(n => n.NoteId == note.NoteId);
 
-        // Update visibility after update, for migrations where the stored proc is not yet changed
-        try
-        {
-            await _db.ExecuteNonQueryAsync(
-                "UPDATE stf.notes SET is_visible_to_player = @p_is_visible_to_player WHERE note_id = @p_note_id",
-                new NpgsqlParameter("p_is_visible_to_player", NpgsqlDbType.Boolean) { Value = note.IsVisibleToPlayer },
-                new NpgsqlParameter("p_note_id", NpgsqlDbType.Varchar) { Value = note.NoteId }
-            );
-        }
-        catch (PostgresException)
-        {
-            // Ignore for legacy DB schema.
-        }
+        if (existing == null)
+            return null;
 
+        existing.PlayerId = string.IsNullOrWhiteSpace(note.PlayerId) ? null : note.PlayerId;
+        existing.ClubId = string.IsNullOrWhiteSpace(note.ClubId) ? null : note.ClubId;
+        existing.Topic = note.Topic;
+        existing.Description = note.Description;
+        existing.Category = note.Category;
+        existing.FollowUpDate = note.FollowUpDate;
+        existing.IsVisibleToPlayer = note.IsVisibleToPlayer;
+        existing.CreatedByScoutId = note.CreatedByScoutId;
 
-        return await GetByIdAsync(note.NoteId);
+        await _footballContext.SaveChangesAsync();
+
+        return existing;
     }
 
     public async Task<bool> DeleteAsync(string id)
     {
-        var result = await _db.ExecuteScalarAsync(
-            "SELECT stf.fn_notes_delete(@p_id)",
-            new NpgsqlParameter("p_id", NpgsqlDbType.Varchar) { Value = id }
-        );
-        return Convert.ToInt32(result ?? 0) > 0;
-    }
+        var existing = await _footballContext.Notes
+            .FirstOrDefaultAsync(n => n.NoteId == id);
 
-    private Note MapReaderToNote(NpgsqlDataReader reader)
-    {
-        bool isVisibleToPlayer = false;
+        if (existing == null)
+            return false;
 
-        // Check if column exists by looking at the field count
-        for (int i = 0; i < reader.FieldCount; i++)
-        {
-            if (reader.GetName(i).Equals("is_visible_to_player", StringComparison.OrdinalIgnoreCase))
-            {
-                if (reader[i] != DBNull.Value)
-                {
-                    isVisibleToPlayer = (bool)reader[i];
-                }
-                break;
-            }
-        }
-
-        return new Note
-        {
-            NoteId = reader["note_id"].ToString()!,
-            PlayerId = reader["player_id"] == DBNull.Value ? null : reader["player_id"].ToString(),
-            ClubId = reader["club_id"] == DBNull.Value ? null : reader["club_id"].ToString(),
-            Topic = reader["topic"].ToString()!,
-            Description = reader["description"].ToString()!,
-            Category = reader["category"].ToString()!,
-            FollowUpDate = reader["follow_up_date"] == DBNull.Value ? null : (DateOnly?)DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("follow_up_date"))),
-            IsVisibleToPlayer = isVisibleToPlayer,
-            CreatedByScoutId = reader["created_by_scout_id"].ToString()!,
-            CreatedAt = (DateTime)reader["created_at"]
-        };
+        _footballContext.Notes.Remove(existing);
+        return await _footballContext.SaveChangesAsync() > 0;
     }
 }

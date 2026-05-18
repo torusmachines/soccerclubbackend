@@ -12,16 +12,19 @@ public class ClubService : IClubService
         _clubRepository = clubRepository;
     }
 
-    public async Task<IEnumerable<Club>> GetAllClubsAsync()
+    public async Task<IEnumerable<FootballDashboardAPI.Models.ClubDto>> GetAllClubsAsync()
     {
-        var clubs = await _clubRepository.GetAllAsync();
-        return clubs.Select(MapToDto);
+        return await _clubRepository.GetAllWithContactCountsAsync();
     }
 
-    public async Task<Club?> GetClubByIdAsync(string id)
+    public async Task<FootballDashboardAPI.Models.ClubDto?> GetClubByIdAsync(string id)
     {
-        var club = await _clubRepository.GetByIdAsync(id);
-        return club == null ? null : MapToDto(club);
+        return await _clubRepository.GetByIdWithContactCountAsync(id);
+    }
+
+    public async Task<FootballDashboardAPI.Models.Responses.ClubDetailsResponse?> GetClubDetailsAsync(string id)
+    {
+        return await _clubRepository.GetClubDetailsWithPlayersAsync(id);
     }
 
     public async Task<Club> CreateClubAsync(CreateClub createClubDto)

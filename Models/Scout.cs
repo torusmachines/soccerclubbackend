@@ -77,6 +77,13 @@ public partial class Scout
     [Precision(0)]
     public DateTime CreatedAt { get; set; }
 
+    [Column("IsDeleted")]
+    public bool? IsDeleted { get; set; }
+
+    [Column("user_status")]
+    [StringLength(20)]
+    public string UserStatus { get; set; } = "Approved";
+
     // Navigation Properties
     [InverseProperty("SentByScout")]
     public virtual ICollection<Email> Emails { get; set; } = new List<Email>();

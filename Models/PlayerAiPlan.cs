@@ -32,14 +32,6 @@ public partial class PlayerAiPlan
     [StringLength(50)]
     public string? SkillType { get; set; }
 
-    [Column("current_level")]
-    [StringLength(20)]
-    public string? CurrentLevel { get; set; }
-
-    [Column("target_level")]
-    [StringLength(20)]
-    public string? TargetLevel { get; set; }
-
     [Column("duration_weeks")]
     public int? DurationWeeks { get; set; }
 
@@ -49,11 +41,14 @@ public partial class PlayerAiPlan
     [Column("session_duration_minutes")]
     public int? SessionDurationMinutes { get; set; }
 
-    [Column("has_injury")]
-    public bool? HasInjury { get; set; }
+    [Column("topnratings")]
+    public int? TopNRatings { get; set; }
 
-    [Column("injury_details")]
-    public string? InjuryDetails { get; set; }
+    [Column("currentrating")]
+    public double? CurrentRating { get; set; }
+
+    [Column("targetrating")]
+    public double? TargetRating { get; set; }
 
     [Column("pdf_path")]
     [StringLength(500)]

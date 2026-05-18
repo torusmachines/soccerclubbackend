@@ -36,16 +36,25 @@ public class DocumentsController : ControllerBase
         return Ok(documents);
     }
 
-    //[HttpGet("{id}")]
-    //public async Task<IActionResult> Get(string id)
-    //{
-    //    var doc = await _service.GetByIdAsync(id);
+    [HttpGet("{id}/download")]
+    public async Task<IActionResult> Download(string id)
+    {
+        var doc = await _service.GetByIdAsync(id);
 
-    //    if (doc == null)
-    //        return NotFound();
+        if (doc == null)
+            return NotFound();
 
-    //    return Ok(doc);
-    //}
+        if (User.IsInRole("Player") && !(doc.IsVisibleToPlayer))
+            return Forbid();
+
+        return Ok(new
+        {
+            documentId = doc.DocumentId,
+            documentName = doc.DocumentName,
+            documentType = doc.DocumentType,
+            fileData = doc.FileData != null ? Convert.ToBase64String(doc.FileData) : null
+        });
+    }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateDocument dto)
